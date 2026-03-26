@@ -1,0 +1,16 @@
+{
+  "name": "ielts-reading-review",
+  "owner": {
+    "name": "dengjiawei1226",
+    "email": "dengjiawei1226@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "ielts-reading-review",
+      "source": ".",
+      "description": "IELTS Academic Reading review skill — per-question error analysis, synonym tracking, vocabulary tagging (538 keywords + COCA 5000), recurring mistake detection, professional HTML review notes with PDF export. 雅思阅读复盘助手：错题拆解、同义替换积累、考点词标注、易错模式追踪。",
+      "version": "1.0.0",
+      "skills": ["./SKILL.md"]
+    }
+  ]
+}
