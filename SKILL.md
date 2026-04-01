@@ -133,3 +133,85 @@ Use the **Three-Step Method**:
 - Vocabulary notes should include phonetic transcription
 - Error analysis should be blunt about the mistake cause — sugar-coating doesn't help learning
 - Chinese is the primary language for notes, with English terms preserved as-is
+
+### Example 1
+
+**Statement:**  
+All students prefer online learning over classroom learning.
+
+**Passage:**  
+Many students enjoy the flexibility of online learning, but others still value face-to-face interaction in classrooms.
+
+**Answer:**  
+False
+
+**Explanation:**  
+The passage says "many" not "all". So the statement is exaggerated.
+
+**Trap Type:**  
+Absolute words (all vs many)
+
+### Example 2
+
+**Statement:**  
+The research was conducted in 2020.
+
+**Passage:**  
+The study was published in 2020, but data collection began in 2018.
+
+**Answer:**  
+Not Given
+
+**Explanation:**  
+The passage does not clearly state when the research was conducted.
+
+**Trap Type:**  
+Not Given vs False confusion
+### Example 3
+
+**Statement:**  
+Some employees work remotely.
+
+**Passage:**  
+All employees are required to work from the office.
+
+**Answer:**  
+False
+
+**Explanation:**  
+The statement says "some", but passage clearly says "all must work in office".
+
+**Trap Type:**  
+Scope mismatch (some vs all)
+### Example 4
+
+**Statement:**  
+The train arrives before 8 PM.
+
+**Passage:**  
+The train usually arrives after 8 PM due to delays.
+
+**Answer:**  
+False
+
+**Explanation:**  
+Timing is reversed (before vs after).
+
+**Trap Type:**  
+Time/sequence trap
+### Example 5
+
+**Statement:**  
+The company always meets its deadlines.
+
+**Passage:**  
+The company often meets deadlines, but delays are sometimes unavoidable.
+
+**Answer:**  
+False
+
+**Explanation:**  
+"Often" ≠ "always".
+
+**Trap Type:**  
+Absolute words
