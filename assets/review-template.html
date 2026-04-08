@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>剑X-TestX-PassageX-主题复盘</title>
 
 <style>
@@ -57,6 +58,29 @@
     break-inside: avoid;
   }
   .alert-box strong { color: #856404; }
+  .good-box {
+    background: #d4edda;
+    border: 2px solid #28a745;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .good-box strong { color: #155724; }
+
+  /* 手机端响应式适配 */
+  @media screen and (max-width: 768px) {
+    body { padding: 12px; font-size: 15px; max-width: 100%; }
+    h1 { font-size: 20px; }
+    h2 { font-size: 18px; }
+    h3 { font-size: 16px; }
+    code { font-size: 13px; word-break: break-all; }
+    blockquote { padding: 8px 12px; margin: 10px 0; }
+    table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: nowrap; }
+    th, td { padding: 6px 8px; font-size: 13px; }
+    .alert-box { padding: 10px; }
+  }
 </style>
 
 </head>
@@ -68,6 +92,12 @@
 <p>得分：X/X ｜ 用时：XX:XX<br/>
 填空题 X/X ✅ ｜ 判断题 X/X ❌ ｜ 多选题 X/X</p>
 </blockquote>
+
+<div class="good-box">
+<strong>✅ 进步点：</strong><br/>
+① 具体进步描述（例如：T/F/NG 前 4 道全对）<br/>
+② 具体进步描述
+</div>
 
 <div class="alert-box">
 <strong>⚠️ 本篇核心问题：（一句话概括最大的失分模式）</strong><br/>
@@ -115,6 +145,17 @@
 </tr>
 </tbody>
 </table>
+
+<!-- ====== 填空题回填检查清单（有填空错题时必须包含） ====== -->
+<div class="alert-box">
+<strong>📋 填空题回填检查清单（每道必做）：</strong>
+<ol>
+<li><strong>语法检查</strong>：放回去读一遍——主谓一致？冠词搭配？</li>
+<li><strong>词性检查</strong>：空格前后的结构决定了需要名词/动词/形容词/副词</li>
+<li><strong>语义检查</strong>：答案和题目的主题必须匹配（题目说 plants → 答案不能是 animals）</li>
+<li><strong>字数检查</strong>：不超过题目要求的字数限制</li>
+</ol>
+</div>
 <hr/>
 
 <!-- ====== 同义替换积累 ====== -->
@@ -151,8 +192,21 @@
 </table>
 <hr/>
 
-<!-- ====== 反复犯错追踪 ====== -->
+<!-- ====== 反复犯错追踪 + 进步趋势 ====== -->
 <h2>五、反复犯错追踪</h2>
+
+<div class="good-box">
+<strong>📈 题型正确率趋势（3+篇数据时展示）：</strong>
+<table>
+<thead><tr><th>篇章</th><th>T/F/NG 正确率</th></tr></thead>
+<tbody>
+<tr><td>剑XT?P?</td><td>X/X（X%）</td></tr>
+<tr><td><strong>当前篇</strong></td><td><strong>X/X（X%）↑↑</strong></td></tr>
+</tbody>
+</table>
+<p>趋势分析（2-3句）...</p>
+</div>
+
 <blockquote>
 <p><strong>「错误类型名」追踪：</strong></p>
 <ul>

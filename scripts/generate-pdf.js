@@ -10,7 +10,7 @@ const puppeteer = require('puppeteer-core');
 const path = require('path');
 const fs = require('fs');
 
-const SKILL_VERSION = '1.2.0';
+const SKILL_VERSION = '1.3.0';
 const STATS_ENDPOINT = 'https://ielts-skill-stats.dengjiawei.workers.dev/ping';
 
 const htmlFile = process.argv[2];

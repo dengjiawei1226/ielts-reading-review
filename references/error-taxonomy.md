@@ -98,3 +98,59 @@ This document classifies common IELTS reading errors into categories. When analy
 **Description:** The test-taker understood the passage and could have answered correctly but made an error due to rushing or insufficient checking.
 
 **Improvement:** Build in a final checking step for every passage before moving on.
+
+---
+
+## Category 9: Fill-in-the-blank Word Form / Part-of-Speech Error
+
+**Description:** The answer has the right root word but wrong form (e.g., adjective instead of noun, singular instead of plural), making it grammatically incorrect when placed back into the sentence.
+
+**Examples:**
+- Stem: "where ___ are unpredictable" → Wrong: `temperate` (adjective) → Correct: `temperatures` (noun plural)
+- Stem: "the ___ of plants" → Wrong: `classify` (verb) → Correct: `classification` (noun)
+
+**Key Rule:** After filling in the answer, **read the complete sentence aloud**. If the grammar doesn't work (e.g., "where temperate are unpredictable"), the word form is wrong.
+
+**Improvement:** Apply the **Fill-in-the-blank Readback Checklist** (see style guide) for every single blank — grammar check, part-of-speech check, semantic check, word count check.
+
+---
+
+## Category 10: Cross-generational / Scope Confusion
+
+**Description:** Confusing what happens to **one individual** vs. **the next generation** or **the species as a whole**. Also applies to mistaking individual cases for general trends.
+
+**Examples:**
+- "Bamboos flower, fruit and die" → One bamboo flowers once in its life cycle (then dies). The *next generation* flowering later is NOT the same plant flowering again.
+- "life cycle" = one individual's life span, not the species' multi-generational history
+
+**Key Rule:** When the passage mentions generations, cycles, or "the next...", track **whose** life cycle or **which** generation is being discussed.
+
+**Improvement:** Circle the subject of each clause. "Every bamboo flowered" vs. "The next generation flowered" — different subjects, different events.
+
+---
+
+## Category 11: Category-Membership Reasoning Treated as Inference
+
+**Description:** When the passage establishes "Category A has property B" and then states "X belongs to Category A", concluding "X has property B" is **direct information**, not inference. The test-taker wrongly treats this as over-inference and chooses NOT GIVEN.
+
+**Examples:**
+- Passage: "Shade-tolerant plants have lower growth rates" + "Eastern hemlock is shade-tolerant" → Eastern hemlock has lower growth rates. This is NOT inference — it's stated through category membership.
+- Test-taker chose NOT GIVEN thinking "the passage doesn't directly say eastern hemlock has lower growth rates"
+
+**Key Rule:** If the passage says "A-type things have X" and "Y is A-type", then "Y has X" is **a stated fact**, not inference. This is TRUE/FALSE territory, not NOT GIVEN.
+
+**Improvement:** When you're leaning toward NOT GIVEN, check: did the passage put the subject into a category that was already described? If yes, the category's properties apply.
+
+---
+
+## Category 12: Adjacent Distractor Words
+
+**Description:** The correct answer word is near other plausible-looking words in the passage. The test-taker picks a nearby word instead of the one that actually fits the sentence structure.
+
+**Examples:**
+- Passage: "This **classification** is commonly used in forestry and horticulture." The word `habitat` appears nearby in the next sentence. Test-taker fills `habitat` instead of `classification`.
+- Passage: "like **sugarcane**, never reach a maximum, but continue to increase photosynthesis rate as light intensity rises." Test-taker fills `light intensity rises` instead of `sugarcane`.
+
+**Key Rule:** After locating the relevant sentence, **only extract the answer from that specific sentence**. Don't let nearby sentences contaminate your answer.
+
+**Improvement:** Underline the exact sentence that corresponds to the question structure, then extract only from within that sentence.

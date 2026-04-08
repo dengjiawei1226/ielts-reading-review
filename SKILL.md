@@ -1,13 +1,13 @@
 ---
 name: ielts-reading-review
-description: "IELTS Reading passage review, scoring, and progress tracking skill. This skill should be used when the user finishes an IELTS Academic Reading passage or full test and wants: (1) a structured review with per-question error analysis, synonym tracking, vocabulary building, and pattern-based mistake tracking; (2) score-to-band conversion and per-passage scoring; (3) cross-test progress statistics and trend analysis. Generates professional HTML review notes with optional PDF export. Trigger phrases include: 雅思复盘, 帮我复盘阅读, IELTS reading review, 分析错题, 阅读错题分析, 成绩单, 打分, 统计, 进步趋势, score, band, progress."
+description: "IELTS Reading passage review, scoring, and progress tracking skill. This skill should be used when the user finishes an IELTS Academic Reading passage or full test and wants: (1) a structured review with per-question error analysis (12 error categories), synonym tracking, vocabulary building, and pattern-based mistake tracking; (2) score-to-band conversion and per-passage scoring; (3) cross-test progress statistics and trend analysis; (4) fill-in-the-blank readback verification; (5) per-question-type progress trend visualization. Generates professional HTML review notes with optional PDF export. Trigger phrases include: 雅思复盘, 帮我复盘阅读, IELTS reading review, 分析错题, 阅读错题分析, 成绩单, 打分, 统计, 进步趋势, score, band, progress."
 ---
 
 # IELTS Reading Review Skill
 
 ## Purpose
 
-Transform raw IELTS Academic Reading practice results into structured, actionable review notes **and track scoring progress across multiple tests**. Each review produces a professional HTML document covering error analysis, synonym accumulation, vocabulary building, recurring-mistake tracking, **score-to-band conversion, per-passage timing breakdown, and cumulative progress statistics** — helping users systematically improve their reading score.
+Transform raw IELTS Academic Reading practice results into structured, actionable review notes **and track scoring progress across multiple tests**. Each review produces a professional HTML document covering error analysis (12 error categories), synonym accumulation, vocabulary building, recurring-mistake tracking, **score-to-band conversion, per-passage timing breakdown, cumulative progress statistics, fill-in-the-blank readback verification, and per-question-type progress trend visualization** — helping users systematically improve their reading score.
 
 ## When to Activate
 
@@ -32,16 +32,28 @@ Ensure the following information is available (ask if missing):
 
 If the user provides results for **all 3 passages of a full test**, collect scores and timing for each passage to generate a combined test scorecard.
 
-### Step 2: Analyze Every Wrong Answer
+### Step 2: Analyze Every Question
+
+#### Wrong Answers (Detailed)
 
 For each wrong question, produce a structured analysis block:
 
 1. **Locate the source sentence** — Quote the exact sentence(s) from the passage
 2. **Map key words** — Show `question keyword` → `passage synonym/paraphrase`
-3. **Classify the error cause** — Use the error taxonomy in `references/error-taxonomy.md`
+3. **Classify the error cause** — Use the error taxonomy in `references/error-taxonomy.md` (12 categories: synonym failure, NG/FALSE confusion, over-inference, stem-word duplication, grammar mismatch, incomplete option matching, vocabulary gap, time pressure, word-form error, cross-generational confusion, category-membership reasoning, adjacent distractor words)
 4. **Extract the lesson** — One actionable takeaway
 
-For correct answers on difficult questions, briefly note the synonym mapping to reinforce learning.
+#### Correct Answers (Brief)
+
+For correct answers, especially on T/F/NG questions, include a brief 2-3 line confirmation showing the synonym mapping:
+
+```
+✅ Q27: 题目原文... TRUE
+原文："引用..."
+`题目关键词` = `原文同义替换`。✅
+```
+
+This reinforces the synonym recognition that led to the correct answer. Keep it concise — do not over-explain correct answers.
 
 ### Step 3: Build the Review Note (HTML)
 
@@ -51,12 +63,13 @@ File naming convention: `剑X-TestX-PassageX-TopicKeyword复盘.html`
 
 The note must include these sections in order:
 
-1. **📌 Score summary & alert box** — Overall score, per-type breakdown, one-sentence core problem
-2. **❌ Per-question error breakdown** — Detailed analysis for each wrong answer
-3. **🔄 Synonym accumulation table** — Passage expression → Question expression → Chinese meaning → Question number
-4. **📝 Vocabulary table** — Word, definition, IELTS frequency rating, Cambridge appearance history
-5. **💡 Recurring mistake tracker** — Cross-passage pattern tracking
-6. **📊 Test scorecard** (when full test data available) — See Step 3b below
+1. **📌 Score summary + progress highlight + alert box** — Overall score, per-type breakdown. Then a `.good-box` highlighting specific things done RIGHT (always find at least 1 positive). Then an `.alert-box` with one-sentence core problem.
+2. **❌ Per-question breakdown** — Detailed analysis for wrong answers + brief confirmation for correct answers (especially T/F/NG). Group by question type (T/F/NG section, then fill-in-the-blank section, etc.)
+3. **📋 Fill-in-the-blank readback checklist** (when fill-in errors exist) — A mandatory `.alert-box` with 4-step verification: grammar check, part-of-speech check, semantic check, word count check. Must appear immediately after the fill-in-the-blank error section.
+4. **🔄 Synonym accumulation table** — Passage expression → Question expression → Chinese meaning → Question number
+5. **📝 Vocabulary table** — Word, definition, IELTS frequency rating, Cambridge appearance history
+6. **💡 Recurring mistake tracker + per-question-type progress trend** — Cross-passage pattern tracking. When 3+ passages of the same question type exist, include a mini trend table (using `.good-box` for positive trends) with specific analysis.
+7. **📊 Test scorecard** (when full test data available) — See Step 3b below
 
 #### Vocabulary Frequency Rating
 
@@ -181,6 +194,13 @@ Use the **Three-Step Method**:
 
 - **Never repeat words already in the question stem** — After filling in the answer, re-read the complete sentence to check for duplicates
 - Respect word limits strictly
+- **Readback Checklist (mandatory for every blank):**
+  1. Grammar check — does the sentence read naturally with the answer filled in?
+  2. Part-of-speech check — does the position require a noun/verb/adjective/adverb? Does your answer match?
+  3. Semantic check — does the answer match the topic? (e.g., if the question says "plants", the answer can't be "animals")
+  4. Word count check — within the word limit?
+- **"such as ___"** → always expects an example/name, never a condition or description
+- **"the ___ of X"** → expects a noun that collocates with "of X"
 
 ### Multiple Choice / Multi-select
 
@@ -193,6 +213,25 @@ Use the **Three-Step Method**:
 - Only consider what the author **explicitly wrote** — do not infer conclusions
 - Concessive clauses like "However far from reality..." acknowledge unreality, not confirm truth
 - `however + adj/adv` = `no matter how` (concessive), not causal
+
+### Common Pitfall: Category-Membership as Direct Information (NEW)
+
+- When the passage says "A-type things have property B" and "X is A-type", then "X has property B" is **stated information**, not inference
+- This is TRUE/FALSE territory, NOT "NOT GIVEN"
+- Example: "Shade-tolerant plants have lower growth rates" + "Eastern hemlock is shade-tolerant" → Eastern hemlock has lower growth rates = directly stated
+
+### Common Pitfall: Cross-generational Confusion (NEW)
+
+- "life cycle" = one individual's life span, not multi-generational species history
+- "flower, fruit and die" = flowers **once** then dies → NOT "flowers several times"
+- "The next generation flowered" ≠ "the same plant flowered again"
+- Always track **whose** life cycle or **which** generation is being discussed
+
+### Common Pitfall: Adjacent Distractor Words (NEW)
+
+- After locating the relevant sentence, extract the answer ONLY from that sentence
+- Don't let nearby sentences contaminate your answer
+- If `habitat` appears in the next sentence but the question maps to `classification` in the current sentence, the answer is `classification`
 
 ## Reference Files
 
