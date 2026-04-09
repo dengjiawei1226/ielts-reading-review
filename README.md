@@ -6,6 +6,47 @@
 
 ---
 
+## 🆕 What's New in v2.3
+
+### 📊 在线复盘系统（Web / 小程序）
+
+除了 AI Skill，我们还上线了两个**在线复盘系统**，不用装任何东西，打开浏览器就能用：
+
+🌐 **Web 版在线体验：** https://tuyaya.online/ielts/
+
+> 做完题 → 输入答案 → 一键生成 AI 复盘报告，手机/电脑都能用。
+
+📱 **微信小程序版**（开发中）：拍照识别答题卡 / 粘贴成绩 / 手动选题，三种方式快速录入。
+
+### 📋 填空回填 4 步检查（v2.0+）
+
+每道填空题强制 4 步验证：语法 → 词性 → 语义 → 字数，杜绝低级失误。
+
+### ✅ 正确题确认 + 进步表扬（v2.0+）
+
+- 做对的题也会简要确认，展示同义替换映射帮你强化记忆
+- 每篇开头先肯定你的进步点，保持刷题动力
+
+### 📈 题型进步趋势可视化（v2.0+）
+
+按题型统计正确率变化，3+ 篇数据后展示进步曲线。
+
+### 🔢 错误分类扩展到 12 类（v2.0+）
+
+新增 4 类错因：
+- 填空词性/词形错误（temperate → temperatures）
+- 跨代/范围混淆（life cycle = 单棵植物一生）
+- 类别归属当推理（A 类有 B 特征 → X 属于 A → X 有 B = 直接信息非推理）
+- 近距离干扰词（classification vs 附近的 habitat）
+
+### 📊 分数换算 + 跨篇进步追踪（v1.2+）
+
+- 自动把原始分换算成雅思 Band 分（基于官方换算表）
+- 每套题自动记分，P1/P2/P3 分段用时，对比 60 分钟考试限时
+- 多套考试成绩汇总表 + 正确率/速度趋势分析
+
+---
+
 ## 🚀 快速开始（3 步上手）
 
 ### 第一步：安装 Skill
@@ -29,6 +70,8 @@ cp -r ielts-reading-review ~/.workbuddy/skills/
 ### 第三步：发给 AI，说"帮我复盘"
 
 就这么简单。AI 会自动生成一份完整的复盘笔记。
+
+**🌐 不想装 Skill？直接用在线版：** https://tuyaya.online/ielts/
 
 ---
 
@@ -63,12 +106,12 @@ Q13: 我选D → 正确A
 
 ### AI 自动产出的复盘笔记
 
-AI 会生成一份结构化的 HTML 复盘笔记，包含以下 5 个模块：
+AI 会生成一份结构化的 HTML 复盘笔记，包含以下模块：
 
-#### 📌 模块一：得分总览 + 核心问题一句话
+#### 📌 模块一：得分总览 + Band 分换算 + 核心问题一句话
 
 ```
-得分：7/13 ｜ 用时：34:40
+得分：7/13 ≈ Band 5.0 ｜ 用时：34:40
 填空题 4/6 ❌ ｜ 判断题 1/2 ❌ ｜ 选择题 2/5 ❌
 
 ⚠️ 核心问题：同义替换识别能力弱——"in association with" = "as part of"、
@@ -77,7 +120,11 @@ AI 会生成一份结构化的 HTML 复盘笔记，包含以下 5 个模块：
 
 > 注意：核心问题会精确指出最大的失分模式，不会说"阅读理解有待提升"这种废话。
 
-#### ❌ 模块二：逐题错因分析
+#### 👍 模块二：进步点肯定
+
+每篇开头先看你做对了什么、哪里比上次进步了。
+
+#### ❌ 模块三：逐题错因分析
 
 每道错题会拆解成 4 个部分：
 
@@ -105,141 +152,77 @@ AI 会生成一份结构化的 HTML 复盘笔记，包含以下 5 个模块：
 | **错因分类** | 🏷️ NOT GIVEN/FALSE 混淆 — "initially" 暗示后续还有，"increasing" 直接矛盾 |
 | **教训** | 题目出现 only/all/never 等绝对词时，大概率答案是 NO，重点找反驳证据 |
 
-#### 🔄 模块三：同义替换积累表
+#### ✅ 模块四：正确题确认
+
+做对的题也会简要确认，展示同义替换映射帮你强化记忆。
+
+#### 🔄 模块五：同义替换积累表
 
 | 原文表达 | 题目表达 | 中文释义 | 题号 |
 |---------|---------|---------|------|
 | in association with other types of support | as part of a wider program of aid | 配合其他支持 → 更广泛援助的一部分 | Q13 |
-| support the economic lives | give business training and loans | 支持经济生活 → 提供培训和贷款 | Q2 |
-| choose entrepreneurship | set up their own business | 选择创业 → 自己开业 | Q4 |
+| support the economic lives | give business training and loans | 支持经济生活 → 提供商业培训和贷款 | Q2 |
+| choose entrepreneurship | set up their own business | 选择创业 → 自己开业 | Q2 |
 
-> 这张表会**跨篇累积**——做的题越多，积累越丰富。
+> **关键**：这张表会跨篇积累。做 10 篇之后你会发现同义替换的敏感度明显提升。
 
-#### 📝 模块四：核心词汇表
+#### 📚 模块六：考点词表
 
-| 词汇 | 释义 | 雅思高频 | 真题出现 |
-|------|------|---------|---------|
-| **exemplify** /ɪɡˈzemplɪfaɪ/ | v. 举例说明 | ⭐⭐⭐ 学术高频 | 剑4T3P1 |
-| **provision** /prəˈvɪʒn/ | n. 提供；条款 | ⭐⭐⭐ 538考点词 | 剑4T3P1 |
-| **a dearth of** /dɜːθ/ | 缺乏（= a lack of） | ⭐⭐ 学术中频 | 剑4T3P1 |
+| 词汇 | 频率 | 含义 | 来源 |
+|------|------|------|------|
+| exemplify | ⭐⭐⭐ 高频 | 举例说明 | 538 考点词 |
+| initiative | ⭐⭐⭐ 高频 | 倡议、方案 | 538 考点词 |
+| substantial | ⭐⭐ 中频 | 大量的、实质性的 | COCA 5000 |
 
-> 每个词标注雅思高频程度（基于 538 考点词 + COCA 5000），不浪费时间背低频词。
-> "真题出现"列会随着做题**持续累积**。
+> 只标注值得背的词。低频词自动过滤，不浪费时间。
 
-#### 💡 模块五：反复犯错追踪
+#### 📈 模块七：跨篇进步追踪
 
-```
-「重复题干词」追踪：
- • 剑4T3P2 Q21：题目有 "years"，又写了 "600 years"（多写了 years）
- • 剑4T3P3 Q39：题目有 "the"，又写了 "The size"（多写了 The）
- → 两次同款错误！填空题必须把答案放回原句读一遍。
-
-「NOT GIVEN vs FALSE 混淆」追踪：
- • 剑4T3P1 Q11：有直接反驳证据（initially→increasing）应选 NO，误选 NG
- → 提目出现绝对词时，优先找反驳证据。
-```
-
-> 这个模块**跨篇追踪**你反复犯的错，做的篇数越多越有价值。
-
-### 最终产出
-
-AI 会生成：
-1. **HTML 复盘笔记** — 排版美观，可直接在浏览器中打开
-2. **PDF 文件**（可选）— A4 格式，适合打印或存档
-3. **工作记忆更新** — 你的错误模式和词汇积累会跨 session 保留
+做 3+ 篇后会自动生成进步趋势表，识别你最常犯的错误类型，给出针对性提升建议。
 
 ---
 
-## 📊 打分 & 进步统计（v1.2.0 新增）
+## 🔗 在线复盘系统
 
-做完一套完整的阅读题（3 篇 Passage），AI 会自动帮你：
+不用安装 Skill，直接在线使用：
 
-### 成绩单
-
-```
-📊 成绩单 — 剑5 Test 4
-
-         P1   P2   P3   总计/40   总用时                        雅思分数
-剑5 T4   11   11    7   29/40    34:10+35:32+51:13=120:55      6.5-7.0
-```
-
-### 多套考试进步趋势
-
-做了多套之后，AI 会自动汇总你的进步趋势：
-
-```
- 场景      P1   P2   P3   总计/40   总用时                        雅思分数
- 剑4 T3    7    6    3   16/40    34:40+42:53+47:55=125:28      5.0
- 剑4 T4    7    7    5   19/40    33:43+30:59+33:50=98:32       5.5
- 剑5 T2    8    9    2   19/40    35:52+36:23+53:32=125:47      5.5
- 剑5 T3   11    9    6   26/40    32:40+39:34+34:32=106:46      6.0-6.5
- 剑5 T4   11   11    7   29/40    34:10+35:32+51:13=120:55      6.5-7.0
-```
-
-AI 还会给出简要的进步分析：
-
-> 正确率在上升（5.0→6.5-7.0），好消息。
-> 平均用时 100-125 分钟，大约是考试时间的两倍。速度还需要提上来。
-> 不过现阶段先追正确率再追速度是对的，等正确率稳在 7 分之后再专项练速度。
+| 平台 | 地址 | 状态 |
+|------|------|------|
+| 🌐 Web 版 | https://tuyaya.online/ielts/ | ✅ 已上线 |
+| 📱 微信小程序 | 搜索「雅思阅读复盘」 | 🚧 开发中 |
 
 ---
 
-## 📥 批量导入历史数据（v2.2.0 增强）
+## 📥 导入历史做题记录
 
-如果你之前已经做了很多篇阅读但还没导入到云端，可以一键批量导入：
+如果你之前已经做了很多题，可以把历史记录批量导入，让 AI 从第一天起就知道你的进步轨迹。
 
-### 方法一：直接告诉 AI
+### 方法一：跟 AI 说（最简单）
 
 ```
-我之前做了这些题：
-剑4T1: P1=9/14, P2=8/12, P3=9/14
-剑4T2: P1=2/13, P2=7/13, P3=2/14
-帮我批量导入
+我之前做过这些题，帮我录入历史记录：
+剑4-T1-P1: 9/14, 25min
+剑4-T1-P2: 8/12, 30min
+剑4-T1-P3: 6/14, 35min
 ```
 
-AI 会自动解析并导入。
+### 方法二：贴一个列表
 
-### 方法二：从复盘 HTML 自动提取
+```
+Book | Test | Passage | Score | Total | Time | Date
+4    | 1    | 1       | 9     | 14    | 25   | 2026-03-15
+4    | 1    | 2       | 8     | 12    | 30   | 2026-03-15
+```
 
-如果你已经有生成好的复盘 HTML 文件，用脚本一键导入：
+### 方法三：用导入脚本
 
 ```bash
-# 先登录获取 Token（或从个人中心页面复制）
-# 然后扫描目录下所有复盘文件并导入
-node scripts/batch-import.js --dir ./reviews --token YOUR_TOKEN
-
-# 先预览要导入的数据（不实际导入）
-node scripts/batch-import.js --dir ./reviews --token YOUR_TOKEN --dry-run
+node scripts/batch-import.js --file my-records.csv
 ```
 
-### 方法三：智能扫描工作空间（推荐！）
+### 方法四：在线版直接录入
 
-如果你一直在用 WorkBuddy/CodeBuddy 做题，你的工作空间里可能有各种格式的历史记录——复盘 HTML、记忆文件（MEMORY.md）、每日笔记、PDF 文件等。一条命令全扫出来：
-
-```bash
-# 扫描整个工作空间，自动从 HTML + Markdown + 记忆文件中提取成绩
-node scripts/batch-import.js --scan /path/to/your/workspace --token YOUR_TOKEN --dry-run
-
-# 确认无误后导入
-node scripts/batch-import.js --scan /path/to/your/workspace --token YOUR_TOKEN
-```
-
-脚本会自动处理：
-- ✅ 复盘 HTML（从 `stat-value` 中提取得分）
-- ✅ Markdown 记忆文件（MEMORY.md、每日 daily log 等）
-- ✅ 各种非标准格式（"剑4T1 P1=9/14"、"得了9分（共14题）"、表格行等）
-- ✅ 自动去重（同篇保留最高分）
-- ⚠️ PDF 文件需要 AI 辅助读取（脚本会列出发现的 PDF 清单）
-
-### 方法四：让 AI 读你的 PDF / 笔记文件
-
-如果你的成绩记录在 PDF 文件或其他格式中，直接告诉 AI：
-
-```
-我工作空间里有一些 PDF 复盘笔记和记忆文件，帮我扫描导入
-```
-
-AI 会自动读取文件内容、提取成绩、展示预览表让你确认后导入。
+访问 https://tuyaya.online/ielts/ ，在「历史记录」页面手动添加。
 
 ### 方法五：用 API 直接导入
 
@@ -313,6 +296,7 @@ ielts-reading-review/
 
 - 支持 SKILL.md 的 AI Agent（如 OpenClaw、Claude Code、WorkBuddy/CodeBuddy）
 - PDF 导出需要：Node.js + puppeteer-core + 本地 Chrome（可选，不装也能用 HTML）
+- 或者直接用在线版 https://tuyaya.online/ielts/ ，无需安装任何东西
 
 ## 🤝 Contact & Feedback
 
@@ -321,15 +305,6 @@ If this Skill helps your IELTS prep, a ⭐ Star would mean a lot!
 如果这个 Skill 对你备考有帮助，欢迎点个 ⭐ 支持！
 
 - 💡 **Feature requests / Bug reports**: [Open an Issue](https://github.com/dengjiawei1226/ielts-reading-review/issues)
-- 💬 **WeChat group / 微信交流群**: Scan to join 👇
-
-<p align="center">
-  <img src="assets/wechat-group-qr.jpg" alt="微信交流群" width="300">
-</p>
-
-> ⚠️ QR code refreshes periodically. If expired, please open an Issue and I'll update it.
->
-> 二维码会定期更新。如果过期了，提个 Issue 我会及时换新的。
 
 ## License
 
