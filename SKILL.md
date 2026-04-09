@@ -58,19 +58,32 @@ This reinforces the synonym recognition that led to the correct answer. Keep it 
 
 ### Step 3: Build the Review Note (HTML)
 
-Use the HTML template at `assets/review-template.html` as the structural and styling foundation.
+Use the **V2 HTML template** at `assets/review-template.html` as the structural and styling foundation. The V2 design system features:
+- CSS Variables (`:root`) for theming
+- Purple gradient `.hero` header with `.book-tag`, `.stats-row`, `.hero-nav` (links to index + bilingual page)
+- `.card` layout with `.icon-box` + Lucide SVG icons (CDN: `unpkg.com/lucide@latest`)
+- `.status-chip.good` / `.status-chip.warn` for progress highlights and alerts
+- `.error-item` cards with `.q-header` / `.answer-compare` / `.quote-block` / `.analysis-block` / `.lesson-box`
+- `.data-table` / `.overview-table` / `.problem-table` for data
+- `.takeaway` purple gradient card for action items
+- `max-width: 960px` via `.container`
+
+See `references/review-style-guide.md` for the complete V2 CSS class reference.
 
 File naming convention: `剑X-TestX-PassageX-TopicKeyword复盘.html`
 
 The note must include these sections in order:
 
-1. **📌 Score summary + progress highlight + alert box** — Overall score, per-type breakdown. Then a `.good-box` highlighting specific things done RIGHT (always find at least 1 positive). Then an `.alert-box` with one-sentence core problem.
-2. **❌ Per-question breakdown** — Detailed analysis for wrong answers + brief confirmation for correct answers (especially T/F/NG). Group by question type (T/F/NG section, then fill-in-the-blank section, etc.)
-3. **📋 Fill-in-the-blank readback checklist** (when fill-in errors exist) — A mandatory `.alert-box` with 4-step verification: grammar check, part-of-speech check, semantic check, word count check. Must appear immediately after the fill-in-the-blank error section.
-4. **🔄 Synonym accumulation table** — Passage expression → Question expression → Chinese meaning → Question number
-5. **📝 Vocabulary table** — Word, definition, IELTS frequency rating, Cambridge appearance history
-6. **💡 Recurring mistake tracker + per-question-type progress trend** — Cross-passage pattern tracking. When 3+ passages of the same question type exist, include a mini trend table (using `.good-box` for positive trends) with specific analysis.
-7. **📊 Test scorecard** (when full test data available) — See Step 3b below
+1. **Hero header** — `.hero` with book tag, title, subtitle with time badge, `.stats-row` score breakdown
+2. **Progress & alert chips** — `.status-chip.good` highlighting specific things done RIGHT (always find at least 1 positive). Then `.status-chip.warn` with one-sentence core problem.
+3. **Per-question breakdown** — `.card` containing `.error-item` blocks for wrong answers + brief confirmation for correct answers (especially T/F/NG). Group by question type.
+4. **Fill-in-the-blank readback checklist** (when fill-in errors exist) — A `.status-chip.warn` with 4-step verification: grammar check, part-of-speech check, semantic check, word count check.
+5. **Synonym accumulation table** — `.data-table` with columns: 原文表达 | 题目表达 | 出处
+6. **Vocabulary table** — `.data-table` with columns: 词汇 | 释义 | 雅思高频 (`.freq-stars`) | 真题出现
+7. **Problem summary** — `.problem-table` with: 问题类型 | 具体表现 | 对应错题 | 改进方法
+8. **Recurring mistake tracker + per-question-type progress trend** — Cross-passage pattern tracking. When 3+ passages of the same question type exist, include a trend table.
+9. **Takeaway card** — `.takeaway` with numbered action items
+10. **Test scorecard** (when full test data available) — See Step 3b below
 
 #### Vocabulary Frequency Rating
 
@@ -148,6 +161,29 @@ After generating a scorecard, **always save the test result to working memory** 
 - Estimated band score
 - Date completed
 
+### Step 3c: Generate Bilingual Page
+
+**Every review note must have a corresponding bilingual (双语对照) HTML page.** This page provides paragraph-by-paragraph English-Chinese parallel text for the original passage.
+
+File naming: `剑X-TestX-PassageX-TopicKeyword双语对照.html`
+Location: `site/bilingual/` directory
+
+Use the **dark-theme bilingual template** at `assets/bilingual-template.html` (or reference any existing bilingual page in `site/bilingual/`). Key features:
+- Dark background (`--bg: #0c0c14`)
+- `.nav-bar` with links back to the review page and to the index
+- `h1` title + `.subtitle` source info
+- `.para-block` for each paragraph, containing:
+  - `.para-label` — Paragraph letter (A, B, C...)
+  - `.en-text` — Original English text
+  - `.cn-text` — Chinese translation (left-bordered)
+- `.vocab-highlight` spans for key vocabulary, with `title` attribute for Chinese meaning
+- Loads `../vocab-card-v2.js` at the end of `<body>` for interactive word cards
+
+**The review page's `.hero-nav` must link to the bilingual page:**
+```html
+<a href="../bilingual/剑X-TestX-PassageX-主题双语对照.html"><i data-lucide="book-open"></i> 双语</a>
+```
+
 ### Step 4: Generate PDF (Optional)
 
 If the user wants a PDF:
@@ -164,6 +200,22 @@ After each review, update the working memory:
 - Update the **vocabulary appearance tracking** across passages
 - Note the user's progress on previously identified weaknesses
 - **Save test scorecard data** (scores, timing, band) for cumulative progress tracking — this is essential for the progress table to work across sessions
+
+### Step 5b: Site Integration & Deployment
+
+After generating the review note and bilingual page, integrate them into the static site:
+
+1. **Copy review HTML** to `site/reviews/`
+2. **Copy bilingual HTML** to `site/bilingual/`
+3. **Update `site/index.html`** — Add the new passage to the directory page data
+4. **Run `site/generate_vocab_synonym.py`** — Regenerates `site/vocab.html` (vocabulary overview) and `site/synonyms.html` (synonym overview) from all review HTML files
+5. **Update `site/changelog.html`** — Increment version, add changelog entry (only for feature/fix changes, not content additions)
+6. **Deploy to server** — Upload all site files:
+   ```bash
+   scp -i ~/.ssh/workbuddy.pem -r site/* ubuntu@42.194.201.36:/var/www/ielts/
+   ```
+
+**Note**: The deployment target is the lightweight cloud server at `tuyaya.online`. The site is served at `https://tuyaya.online/ielts/`.
 
 ### Step 6: Feedback Nudge (Once per session)
 
@@ -240,11 +292,14 @@ Use the **Three-Step Method**:
 |------|---------|
 | `references/error-taxonomy.md` | Complete error type classification with examples |
 | `references/538-keywords-guide.md` | Guide for using the 538 IELTS keywords list |
-| `references/review-style-guide.md` | Writing style and formatting conventions |
+| `references/review-style-guide.md` | V2 design system CSS class reference and formatting conventions |
 | `references/score-band-table.md` | IELTS Academic Reading score-to-band conversion table |
-| `assets/review-template.html` | HTML template with full CSS styling |
+| `assets/review-template.html` | V2 HTML template with full CSS styling (purple gradient, Lucide icons, card layout) |
+| `assets/bilingual-template.html` | Dark-theme bilingual page template (English-Chinese parallel text) |
 | `scripts/generate-pdf.js` | PDF generation script (Node.js + puppeteer-core) |
 | `scripts/batch-import.js` | Batch import historical scores from review HTML files |
+| `site/generate_vocab_synonym.py` | Extract vocabulary and synonym data from all review HTML files |
+| `site/vocab-card-v2.js` | Interactive vocabulary card component for bilingual pages (loads dict_full.json) |
 
 ## Style Guidelines
 

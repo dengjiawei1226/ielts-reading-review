@@ -1,4 +1,4 @@
-# Review Note Style Guide
+# Review Note Style Guide (V2)
 
 ## General Tone
 
@@ -7,144 +7,189 @@
 - **Honest about errors** — Sugar-coating doesn't help learning; be blunt about what went wrong
 - **Chinese as primary language** — English terms, vocabulary, and passage quotes preserved as-is
 
+## V2 Design System
+
+The review notes use a modern card-based design with CSS Variables, Lucide SVG icons, and a purple gradient hero header. All icons come from Lucide (CDN: `unpkg.com/lucide@latest`), no emoji in the HTML.
+
+### CSS Class Reference
+
+| V2 Class | Purpose | Notes |
+|----------|---------|-------|
+| `.container` | Main content wrapper | `max-width: 960px` |
+| `.hero` | Purple gradient header | Contains `.book-tag`, `h1`, `.subtitle`, `.stats-row` |
+| `.hero-nav` | Top-right nav buttons | Links to index + bilingual page |
+| `.book-tag` | Source tag (e.g. "剑6 · Test 1 · Passage 1") | Inside `.hero` |
+| `.stats-row` > `.stat-item` | Score stats in hero | `.stat-value` + `.stat-label` |
+| `.time-badge` | Time spent badge | Inside `.subtitle` |
+| `.card` | Generic content card | White bg, rounded corners, shadow |
+| `.card-title` | Card header with icon | `.icon-box` + text |
+| `.status-chip.good` | Progress highlight | Green icon, success theme |
+| `.status-chip.warn` | Alert / core problem | Amber icon, warning theme |
+| `.error-item` | Error analysis card | Red left border, contains sub-components |
+| `.q-header` | Question header row | `.q-num` + `.badge` tags |
+| `.badge-fill` | Blue info badge | Question type tag |
+| `.badge-type` | Gray badge | Sub-type tag |
+| `.answer-compare` | Answer comparison row | `.ans-box.mine` + `.ans-box.correct` |
+| `.quote-block` | Passage quote | Gray bg, `.quote-label` header |
+| `.analysis-block` | Error cause analysis | `.section-label` + `<ul>` |
+| `.lesson-box` | Lesson learned | Purple-tinted bg |
+| `.data-table` | Data tables (vocab, synonyms) | Dark header (`#1e1b4b`), rounded |
+| `.overview-table` | Answer overview table | Accent-colored header |
+| `.problem-table` | Problem summary table | Red header |
+| `.freq-stars` | IELTS frequency stars | Lucide `<i data-lucide="star">` with `.empty` class |
+| `.takeaway` | Action items card | Purple gradient bg, white text |
+| `.result-correct` | Correct answer indicator | Green text + check icon |
+| `.result-wrong` | Wrong answer indicator | Red text + x icon |
+
+### Key CSS Variables
+
+```css
+:root {
+  --bg: #f0f2f5;        /* Page background */
+  --card: #ffffff;       /* Card background */
+  --text: #1d1d1f;       /* Primary text */
+  --text-secondary: #6b7280;  /* Secondary text */
+  --accent: #4f46e5;     /* Brand purple */
+  --accent-light: #eef2ff;    /* Light purple bg */
+  --success: #059669;    /* Green (correct) */
+  --danger: #dc2626;     /* Red (wrong) */
+  --warning: #d97706;    /* Amber (alert) */
+  --info: #2563eb;       /* Blue (info) */
+  --border: #e5e7eb;     /* Border color */
+  --radius: 16px;        /* Card radius */
+  --radius-sm: 10px;     /* Small radius */
+}
+```
+
+### Icon Usage
+
+All icons use Lucide SVG via `<i data-lucide="icon-name"></i>`. Common icons:
+- `home` — Index link
+- `book-open` — Bilingual page link / passage quote
+- `clock` — Time spent
+- `trending-up` — Progress highlight
+- `alert-triangle` — Core problem alert
+- `x-circle` — Error section header
+- `x` — Wrong answer
+- `check` — Correct answer
+- `brain` — Error analysis
+- `lightbulb` — Lesson learned
+- `repeat` — Synonym section
+- `book-marked` — Vocabulary section
+- `alert-circle` — Problem summary
+- `zap` — Action items
+- `star` — IELTS frequency rating (`.freq-stars`)
+
 ## Section-by-Section Guidelines
 
-### Score Summary & Alert Box
-- State the score factually: `得分：8/13 ｜ 用时：18:30`
-- Break down by question type with ✅ / ❌ indicators
-- The alert box should contain ONE sentence identifying the biggest scoring pattern (not a vague "需要加强练习")
+### Hero Header
+- Purple gradient with `.book-tag`, title, subtitle with time badge
+- `.stats-row` shows score breakdown (总分 / 填空 / 判断 / 匹配)
+- `.hero-nav` top-right with links to index and bilingual page
+
+### Progress & Alert Chips
+- `.status-chip.good` — Always find at least 1 positive point, even in a bad score
+- `.status-chip.warn` — ONE sentence identifying the biggest scoring pattern
+- Be specific: "T/F/NG 前 4 道全对" is good; "有进步" is bad
 - Bad example: "阅读理解能力有待提升" ← too vague
 - Good example: "3道判断题全错，均为 NG 误判为 FALSE——没区分「没提到」和「相反」" ← specific and actionable
 
-### Error Analysis Blocks
-- Always include the **original passage quote** in a blockquote
-- Keyword mapping uses `code` formatting: `题目词` = 原文同义词
+### Error Analysis Blocks (`.error-item`)
+- `.q-header` with question number and type badges
+- `.answer-compare` showing user's wrong answer vs correct answer
+- `.quote-block` with passage quote and location label
+- `.analysis-block` with error cause bullets
+- `.lesson-box` with single-sentence takeaway
 - Error cause should reference the error taxonomy category
-- Each block ends with a single-sentence lesson
 
-### Synonym Table
+### Correct Answer Brief Analysis
+For correct answers on non-trivial questions (especially T/F/NG), include within the answer overview table or as a brief note. Keep to 2-3 lines showing the synonym mapping. Purpose: reinforce synonym recognition.
+
+### Synonym Table (`.data-table`)
 - Only include synonyms relevant to the questions (not every synonym in the passage)
+- Columns: 原文表达 | 题目表达 | 出处
 - Include the question number for cross-reference
-- Chinese meaning should be concise (2-4 characters)
 
-### Vocabulary Table
+### Vocabulary Table (`.data-table`)
 - Include phonetic transcription (IPA) after the word
 - Part of speech before the definition
-- IELTS frequency rating is mandatory (see 538 keywords guide)
-- "Cambridge Appearance" column starts with current passage and accumulates over time
+- IELTS frequency rating is mandatory — use `.freq-stars` with Lucide star icons
+- "真题出现" column tracks which real tests the word has appeared in
 - Skip low-frequency specialist terms unless they caused an error
 
-### Recurring Mistake Tracker
-- Only include if the same error pattern has appeared in previous passages
-- Format: List each occurrence with passage reference
-- This section should grow across reviews — it's the most valuable long-term asset
-- **Include a per-question-type progress trend table** when data from 3+ passages exists (see below)
+### Problem Summary (`.problem-table`)
+- Red header table
+- Columns: 问题类型 | 具体表现 | 对应错题 | 改进方法
 
-### Per-question-type Progress Trend (NEW)
+### Takeaway Card (`.takeaway`)
+- Purple gradient background, white text
+- Numbered action items with `<strong>` in gold (`#fde68a`)
+- Include synonym additions as `<code>` items
 
-When the user has completed 3+ passages of the same question type (e.g., T/F/NG), include a mini trend table:
+### Fill-in-the-blank Readback Checklist
+When fill-in errors exist, include as a `.status-chip.warn`:
+1. 语法检查 — 放回去读一遍
+2. 词性检查 — 空格前后决定词性
+3. 语义检查 — 答案和题目主题匹配
+4. 字数检查 — 不超过限制
 
-```html
-<div class="good-box">
-<strong>📈 T/F/NG Passage 3 进步趋势：</strong>
-<table>
-<thead><tr><th>篇章</th><th>T/F/NG 正确率</th></tr></thead>
-<tbody>
-<tr><td>剑5T2P3</td><td>0/3（0%）</td></tr>
-<tr><td>剑5T3P3</td><td>1/6（17%）</td></tr>
-<tr><td><strong>剑5T4P3</strong></td><td><strong>4/7（57%）↑↑</strong></td></tr>
-</tbody>
-</table>
-</div>
-```
-
-Rules:
-- Use the `.good-box` CSS class (green border) for positive trends
+### Per-question-type Progress Trend
+When 3+ passages of the same question type exist, include a trend table inside a `.status-chip.good`:
 - Bold the current passage row
-- Add ↑/↑↑/↓ indicators for trend direction
-- After the table, provide 2-3 sentences of specific analysis (not generic encouragement)
-
-### Fill-in-the-blank Readback Checklist (NEW)
-
-Every review that includes fill-in-the-blank errors MUST include this checklist as an `.alert-box`:
-
-```html
-<div class="alert-box">
-<strong>📋 填空题回填检查清单（每道必做）：</strong>
-<ol>
-<li><strong>语法检查</strong>：放回去读一遍——主谓一致？冠词搭配？</li>
-<li><strong>词性检查</strong>：空格前后的结构决定了需要名词/动词/形容词/副词</li>
-<li><strong>语义检查</strong>：答案和题目的主题必须匹配（题目说 plants → 答案不能是 animals）</li>
-<li><strong>字数检查</strong>：不超过题目要求的字数限制</li>
-</ol>
-</div>
-```
-
-This checklist must appear after the fill-in-the-blank error analysis section, not buried at the end.
-
-### Correct Answer Brief Analysis (NEW)
-
-For correct answers on non-trivial questions (especially T/F/NG), include a brief confirmation note showing the synonym mapping:
-
-```html
-<h3>✅ Q27：题目原文... <span class="tag-yes">TRUE</span></h3>
-<p>原文："引用..."<br/>
-<code>题目关键词</code> = <code>原文同义替换</code>。✅</p>
-```
-
-Purpose: Reinforce the synonym recognition that led to the correct answer. Keep it to 2-3 lines — don't over-explain correct answers.
-
-### Progress Highlight Box (NEW)
-
-At the top of each review (right after the score summary), include a `.good-box` highlighting what went RIGHT:
-
-```html
-<div class="good-box">
-<strong>✅ 进步点：</strong><br/>
-① 具体进步描述...<br/>
-② 具体进步描述...
-</div>
-```
-
-Rules:
-- Always find at least 1 positive point, even in a bad score
-- Be specific: "T/F/NG 前 4 道全对" is good; "有进步" is bad
-- Place it before the alert-box (problems)
+- Add ↑/↑↑/↓ indicators
+- After the table, 2-3 sentences of specific analysis
 
 ### Test Scorecard (Full Test)
-- Generated when the user completes all 3 passages of a test
-- Format: `得分 + 用时 + 总计/40 + 总用时 + 雅思分数`
-- Per-passage scores shown as separate P1/P2/P3 columns
-- Time breakdown: `P1时间+P2时间+P3时间=总时间` (e.g., `34:10+35:32+51:13=120:55`)
-- Band score from `references/score-band-table.md`, boundary scores shown as range (e.g., `6.5-7.0`)
-- Always include comparison to the 60-minute exam time limit
+- Generated when user completes all 3 passages
+- Use `.data-table` format
+- Format: P1/P2/P3 scores, 总计/40, 总用时, 雅思分数
+- Band score from `references/score-band-table.md`
 
 ### Cumulative Progress Table
-- Generated when 2+ full tests exist in memory
-- Rows ordered chronologically (oldest first → newest last)
-- Columns: 场景 | P1 | P2 | P3 | 总计/40 | 总用时 | 雅思分数
-- After the table, include 3-5 sentences of progress analysis:
-  1. Accuracy trend (is score improving?)
-  2. Speed vs. 60-minute benchmark
-  3. ONE concrete strategy suggestion
-  4. Per-passage pattern observation (P3 usually hardest)
-- Tone: encouraging but honest. Examples:
-  - Good: "正确率在上升（5.0→6.5-7.0），好消息"
-  - Good: "速度还需要提上来——如果硬卡 60 分钟，正确率可能会掉 1-1.5 分"
-  - Good: "不过现阶段先追正确率再追速度是对的"
-  - Bad: "继续加油哦！" ← empty encouragement
+- Generated when 2+ full tests exist
+- Rows ordered chronologically
+- After the table: accuracy trend, speed analysis, strategy advice, per-passage pattern
 
 ## Naming Convention
 
+### Review notes
 `剑X-TestX-PassageX-TopicKeyword复盘.html`
 
 Examples:
 - `剑4-Test3-Passage1-街头青年信贷复盘.html`
-- `剑5-Test2-Passage3-动物迁徙复盘.html`
+- `剑6-Test1-Passage1-澳洲体育成功复盘.html`
+
+### Bilingual pages
+`剑X-TestX-PassageX-TopicKeyword双语对照.html`
+
+Examples:
+- `剑5-Test4-Passage3-光对动植物影响双语对照.html`
+- `剑6-Test1-Passage1-澳洲体育成功双语对照.html`
 
 ## Formatting Rules
 
-- Use the HTML template's CSS classes: `.correct`, `.wrong`, `.tag-yes`, `.tag-no`, `.tag-ng`, `.alert-box`
-- Tables must use the template's styling (blue header, alternating row colors)
-- Keep page-break-inside: avoid on blockquotes and table rows for clean PDF output
-- No emoji overuse — limit to section headers (📌 ❌ 🔄 📝 💡)
+- Use the V2 CSS classes documented above (NOT the deprecated V1 classes)
+- Icons use Lucide SVG (`<i data-lucide="..."></i>`), not emoji
+- Tables use `.data-table`, `.overview-table`, or `.problem-table` styling
+- Keep `break-inside: avoid` on cards and error items for clean PDF output
+- All pages load Lucide from CDN at the end of `<body>`:
+  ```html
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>lucide.createIcons();</script>
+  ```
+
+### Deprecated V1 Classes (DO NOT USE)
+
+These classes belong to the old V1 template and should NOT appear in new reviews:
+
+| Deprecated Class | V2 Replacement |
+|-----------------|----------------|
+| `.correct` | `.result-correct` |
+| `.wrong` | `.result-wrong` |
+| `.tag-yes` / `.tag-no` / `.tag-ng` | `.badge` with appropriate styling |
+| `.alert-box` | `.status-chip.warn` |
+| `.good-box` | `.status-chip.good` |
+| `h1/h2/h3` section headers | `.card-title` with `.icon-box` |
+| `blockquote` for quotes | `.quote-block` with `.quote-label` |
+| `max-width: 800px` | `max-width: 960px` via `.container` |
+| `#4A90D9` hardcoded blue | `var(--accent)` CSS variable |
