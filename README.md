@@ -184,6 +184,76 @@ AI 还会给出简要的进步分析：
 
 ---
 
+## 📥 批量导入历史数据（v2.2.0 增强）
+
+如果你之前已经做了很多篇阅读但还没导入到云端，可以一键批量导入：
+
+### 方法一：直接告诉 AI
+
+```
+我之前做了这些题：
+剑4T1: P1=9/14, P2=8/12, P3=9/14
+剑4T2: P1=2/13, P2=7/13, P3=2/14
+帮我批量导入
+```
+
+AI 会自动解析并导入。
+
+### 方法二：从复盘 HTML 自动提取
+
+如果你已经有生成好的复盘 HTML 文件，用脚本一键导入：
+
+```bash
+# 先登录获取 Token（或从个人中心页面复制）
+# 然后扫描目录下所有复盘文件并导入
+node scripts/batch-import.js --dir ./reviews --token YOUR_TOKEN
+
+# 先预览要导入的数据（不实际导入）
+node scripts/batch-import.js --dir ./reviews --token YOUR_TOKEN --dry-run
+```
+
+### 方法三：智能扫描工作空间（推荐！）
+
+如果你一直在用 WorkBuddy/CodeBuddy 做题，你的工作空间里可能有各种格式的历史记录——复盘 HTML、记忆文件（MEMORY.md）、每日笔记、PDF 文件等。一条命令全扫出来：
+
+```bash
+# 扫描整个工作空间，自动从 HTML + Markdown + 记忆文件中提取成绩
+node scripts/batch-import.js --scan /path/to/your/workspace --token YOUR_TOKEN --dry-run
+
+# 确认无误后导入
+node scripts/batch-import.js --scan /path/to/your/workspace --token YOUR_TOKEN
+```
+
+脚本会自动处理：
+- ✅ 复盘 HTML（从 `stat-value` 中提取得分）
+- ✅ Markdown 记忆文件（MEMORY.md、每日 daily log 等）
+- ✅ 各种非标准格式（"剑4T1 P1=9/14"、"得了9分（共14题）"、表格行等）
+- ✅ 自动去重（同篇保留最高分）
+- ⚠️ PDF 文件需要 AI 辅助读取（脚本会列出发现的 PDF 清单）
+
+### 方法四：让 AI 读你的 PDF / 笔记文件
+
+如果你的成绩记录在 PDF 文件或其他格式中，直接告诉 AI：
+
+```
+我工作空间里有一些 PDF 复盘笔记和记忆文件，帮我扫描导入
+```
+
+AI 会自动读取文件内容、提取成绩、展示预览表让你确认后导入。
+
+### 方法五：用 API 直接导入
+
+```bash
+curl -X POST 'https://tuyaya.online/api/ielts' \
+  -H 'Content-Type: application/json' \
+  -d '{"action":"batchImport","token":"YOUR_TOKEN","reviews":[
+    {"book":4,"test":1,"passage":1,"score":9,"total":14,"date":"2026-03-15"},
+    {"book":4,"test":1,"passage":2,"score":8,"total":12,"date":"2026-03-15"}
+  ]}'
+```
+
+---
+
 ## 🎯 Features
 
 | 功能 | 说明 |
@@ -214,7 +284,8 @@ ielts-reading-review/
 │   ├── score-band-table.md           # 分数→Band 换算表
 │   └── review-style-guide.md         # 写作风格规范
 └── scripts/
-    └── generate-pdf.js               # PDF 生成脚本
+    ├── generate-pdf.js               # PDF 生成脚本
+    └── batch-import.js               # 历史数据批量导入脚本
 ```
 
 ## 🧠 内置做题方法论
