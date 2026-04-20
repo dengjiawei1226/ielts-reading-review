@@ -8,8 +8,8 @@
     {
       "name": "ielts-reading-review",
       "source": ".",
-      "description": "IELTS Academic Reading review skill — per-question error analysis (12 categories), synonym tracking, vocabulary tagging (538 keywords + COCA 5000), recurring mistake detection, fill-in-the-blank readback checklist, per-question-type progress trends, score-to-band conversion, per-passage timing, cumulative progress statistics, batch import historical scores, multi-user cloud sync, professional HTML review notes with PDF export. 雅思阅读复盘助手：12类错因分析、同义替换积累、考点词标注、易错模式追踪、填空回填检查、题型进步趋势、打分换算、进步统计、历史数据批量导入、多用户云同步。",
-      "version": "2.3.0",
+      "description": "IELTS Academic Reading review skill — offline-first, generates structured review data (JSON) + professional HTML/PDF review notes locally. 12-category error analysis, synonym tracking, vocabulary tagging (538 keywords + COCA 5000), recurring mistake detection, fill-in-the-blank readback checklist, score-to-band conversion. v3.1 adds explicit Web hand-off: upload the generated JSON to https://tuyaya.online/ielts/submit.html to sync scores, vocabulary and synonyms to cloud. 雅思阅读复盘助手：纯离线生成复盘数据(JSON)+HTML+PDF，12类错因分析、同义替换积累、考点词标注、易错模式追踪、填空回填检查、打分换算。v3.1 新增Web端 JSON 上传对接。",
+      "version": "3.1.0",
       "skills": ["./SKILL.md"]
     }
   ]
