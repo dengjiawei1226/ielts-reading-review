@@ -154,3 +154,82 @@ This document classifies common IELTS reading errors into categories. When analy
 **Key Rule:** After locating the relevant sentence, **only extract the answer from that specific sentence**. Don't let nearby sentences contaminate your answer.
 
 **Improvement:** Underline the exact sentence that corresponds to the question structure, then extract only from within that sentence.
+
+---
+
+## Category 13: Heading Match — Using Example's Answer
+
+**Description:** In List of Headings questions, the test-taker selects a heading that was already used by the worked Example, effectively double-assigning it.
+
+**Examples:**
+- Example assigns heading `iii` to Section A. Test-taker picks `iii` again for Section D.
+- The correct heading for Section D was `v`, but test-taker forgot to cross off `iii`.
+
+**Key Rule:** **First step of any Heading Match question**: cross off ALL headings already used by Examples. They are eliminated and cannot be reused (unless the question says "NB You may use any heading more than once").
+
+**Improvement:** Before even reading the paragraphs, physically cross off used headings. Mark positive/negative tone for remaining headings, then match.
+
+---
+
+## Category 14: Concessive Clause Main-Clause Confusion
+
+**Description:** In sentences with Although/While/Despite/Even though, the test-taker bases their judgment on the concessive (subordinate) clause instead of the main clause. The main clause carries the author's actual position.
+
+**Examples:**
+- "Although industrial output has soared, water consumption has slowed" → Author's point = consumption slowed (main clause), NOT output soared (concessive clause)
+- Test-taker judges Y/N/NG based on "industrial output soared" and ignores the main clause contradiction
+
+**Key Rule:** In Although/While/Despite sentences: concessive clause = acknowledged background; **main clause = author's real position**. Y/N/NG judgment must be based on the main clause.
+
+**Improvement:** Circle the main clause. Ask: "What is the author actually asserting?" The Although-clause is just context.
+
+---
+
+## Category 15: Double Negative Misread
+
+**Description:** Failing to recognize that two negatives cancel out to make a positive. This error has appeared in multiple forms and keeps recurring.
+
+**Complete checklist of double-negative patterns:**
+- `not unusual` = usual / common
+- `not uncommon` = common
+- `not insignificant` = significant
+- `not unimportant` = important
+- `not unlikely` = likely
+- `rarely + isn't` = almost always is
+- `seldom + not` = almost always
+- `hardly + negative` = positive
+
+**Key Rule:** When you see ANY negative prefix (un-, in-, im-) or negative adverb (rarely, seldom, hardly) combined with another negative (not, isn't, wasn't), immediately translate to the positive equivalent.
+
+**Improvement:** Highlight every negative word in the sentence. Count them. Even number of negatives = positive meaning.
+
+---
+
+## Category 16: Summary Fill-in-the-blank Without Source Location
+
+**Description:** Attempting Summary completion by looking at the answer options and guessing which "feels right" for each blank, without first locating the corresponding passage sentences.
+
+**The 0/4 Disaster (C7T1P3 Q37-40):** All four blanks wrong because the test-taker never went back to the passage to find the matching sentences.
+
+**Mandatory Three-Step Process:**
+1. **Locate** the corresponding paragraph(s) in the passage
+2. **Find** the specific sentence that matches the summary statement
+3. **Match** the option word to the original passage word/concept
+
+**Key Rule:** Summary blanks are NOT a vocabulary test — they are a paraphrase-matching exercise. The answer is always findable in the passage. If you can't point to the passage sentence, you're guessing.
+
+**Improvement:** Before filling ANY blank, write down the passage paragraph and sentence number where the answer comes from. No source = don't fill.
+
+---
+
+## Category 17: Comparison Signal Words Ignored
+
+**Description:** Missing comparison frameworks like "difference from X", "unlike X", "in contrast to X" which establish that the subject has a different property from X.
+
+**Examples:**
+- "Another difference from conventional teaching is the evidence that students can learn 1000 new words" → suggestopedia students learn MORE than conventional (1000 words IS the difference)
+- Test-taker chose FALSE because "no direct number comparison is given" — but "difference from X" IS the comparison framework
+
+**Key Rule:** "Difference from X" = the subject is NOT like X in this respect. The rest of the sentence describes HOW it differs. You don't need two numbers side-by-side.
+
+**Improvement:** Circle comparison markers (difference from, unlike, in contrast to, compared with). These are implicit comparisons — the sentence after them IS the evidence.
