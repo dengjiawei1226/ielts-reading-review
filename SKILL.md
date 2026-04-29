@@ -9,7 +9,7 @@ description: "IELTS Reading passage review, scoring, and progress tracking skill
 
 帮用户把雅思阅读做题结果变成结构化复盘笔记（HTML + PDF）和结构化数据（JSON），追踪分数进步趋势。
 
-## Architecture (v3.9 — Offline + Template Page + Web Hand-off)
+## Architecture (v3.9.1 — Offline + Template Page + Web Hand-off)
 
 **Skill 纯离线执行**——所有错题分析、文件生成都在本地完成，不发起任何网络请求。
 
@@ -18,7 +18,9 @@ description: "IELTS Reading passage review, scoring, and progress tracking skill
 2. **结构化 JSON（v4.0）** — 成绩、错题、词汇、同义替换的全量数据。**部署到 `reviews/` 后可通过 `review.html?file=xxx.json` 在线渲染**（新通用模板页）
 3. **复盘 PDF** — 从 HTML 生成的 PDF 文件，便于存档和分享（可选）
 
-> **v3.9 新增**：词库覆盖校验（dict_full.json 缺词 = 词卡展开不工作）、saveReview API 入库步骤、answers[] 字段名规范、线上词卡验证步骤。
+> **v3.9.1 新增**：Step 0 自动版本检查（scripts/check-update.js），每次激活时比对本地与 ClawHub 版本。
+
+> **v3.9.0 新增**：词库覆盖校验（dict_full.json 缺词 = 词卡展开不工作）、saveReview API 入库步骤、answers[] 字段名规范、线上词卡验证步骤。
 
 > **v3.8 新增**：Web 端新增 `review.html` 通用模板页，可直接渲染 JSON（支持 v3.0 和 v4.0）。后端 `buildReviewFileIndex` 优先索引 `.json` 文件，reviewLink 自动指向 `review.html?file=xxx.json`。
 
@@ -29,6 +31,29 @@ description: "IELTS Reading passage review, scoring, and progress tracking skill
 - 用户发做题截图/答案，提到"复盘""错题分析""阅读复盘"
 - 用户问成绩、分数、进步趋势
 - 用户要生成复盘笔记或 PDF
+
+## Step 0: Version Check (Auto — Run on Every Activation)
+
+**每次 Skill 被激活时，先检查版本是否最新**：
+
+```bash
+node ~/.workbuddy/skills/ielts-reading-review/scripts/check-update.js
+```
+
+- 如果输出 `✅ 已是最新版本` → 继续正常工作
+- 如果输出 `🆕 有新版本可用！` → **提示用户**：
+
+```
+⚠️ ielts-reading-review 有新版本 vX.Y.Z（当前 vA.B.C），是否更新？
+更新内容可能包含新的错误分类规则、部署步骤修复等。
+```
+
+用户同意后执行自动更新：
+```bash
+node ~/.workbuddy/skills/ielts-reading-review/scripts/check-update.js --auto
+```
+
+> 如果 `check-update.js` 不存在（旧版本安装），跳过版本检查继续工作。
 
 ## Workflow
 
