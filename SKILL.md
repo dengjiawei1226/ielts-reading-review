@@ -1,30 +1,26 @@
 ---
 name: ielts-reading-review
-description: "IELTS Reading passage review, scoring, and progress tracking skill. Generates structured review data (JSON) and professional HTML/PDF review notes locally — no server required. Supports batch import of legacy reviews with auto-discovery of review folders. Trigger phrases: 雅思复盘, 帮我复盘阅读, IELTS reading review, 分析错题, 阅读错题分析, 成绩单, 打分, 统计, 进步趋势, 批量导入历史复盘, 历史笔记转 JSON, 把文件夹里的复盘都生成 JSON, 扫一下我电脑里的复盘, 帮我找出所有历史笔记, 自动发现复盘, score, band, progress, batch import, auto scan."
+description: "IELTS Reading passage review, scoring, and progress tracking skill. Generates structured review data (JSON) and deploys to tuyaya.online via saveReview API. The server's review.html template renders JSON into unified pages. No standalone HTML generation needed. Supports batch import of legacy reviews with auto-discovery of review folders. Trigger phrases: 雅思复盘, 帮我复盘阅读, IELTS reading review, 分析错题, 阅读错题分析, 成绩单, 打分, 统计, 进步趋势, 批量导入历史复盘, 历史笔记转 JSON, 把文件夹里的复盘都生成 JSON, 扫一下我电脑里的复盘, 帮我找出所有历史笔记, 自动发现复盘, score, band, progress, batch import, auto scan."
 ---
 
 # IELTS Reading Review Skill
 
 ## Purpose
 
-帮用户把雅思阅读做题结果变成结构化复盘笔记（HTML + PDF）和结构化数据（JSON），追踪分数进步趋势。
+帮用户把雅思阅读做题结果变成结构化数据（JSON），通过 saveReview API 入库后由后端 review.html 模板统一渲染页面。
 
-## Architecture (v3.9.1 — Offline + Template Page + Web Hand-off)
+## Architecture (v4.0 — JSON Only + Server Template)
 
-**Skill 纯离线执行**——所有错题分析、文件生成都在本地完成，不发起任何网络请求。
+**⚠️ 不再生成复盘 HTML！** 后端 `review.html` 模板页统一渲染 JSON，单独生成的 HTML 完全无用。
 
 产出物：
-1. **复盘 HTML** — 专业排版的复盘笔记，双击浏览器打开（独立静态文件）
-2. **结构化 JSON（v4.0）** — 成绩、错题、词汇、同义替换的全量数据。**部署到 `reviews/` 后可通过 `review.html?file=xxx.json` 在线渲染**（新通用模板页）
-3. **复盘 PDF** — 从 HTML 生成的 PDF 文件，便于存档和分享（可选）
+1. **结构化 JSON（v4.0）** — 成绩、错题、词汇、同义替换的全量数据。通过 saveReview API 入库后，`review.html?file=xxx.json` 在线渲染
+
+> **v4.0 变更**：不再生成复盘 HTML。后端 review.html 模板页统一渲染 JSON，单独生成 HTML 无用。复盘只需 JSON + saveReview API 入库。
 
 > **v3.9.1 新增**：Step 0 自动版本检查（scripts/check-update.js），每次激活时比对本地与 ClawHub 版本。
 
 > **v3.9.0 新增**：词库覆盖校验（dict_full.json 缺词 = 词卡展开不工作）、saveReview API 入库步骤、answers[] 字段名规范、线上词卡验证步骤。
-
-> **v3.8 新增**：Web 端新增 `review.html` 通用模板页，可直接渲染 JSON（支持 v3.0 和 v4.0）。后端 `buildReviewFileIndex` 优先索引 `.json` 文件，reviewLink 自动指向 `review.html?file=xxx.json`。
-
-产出物与 Web 端（tuyaya.online）的对接方式详见下方 **Step 6: Apply to Web**。
 
 ## When to Activate
 
@@ -78,40 +74,15 @@ node ~/.workbuddy/skills/ielts-reading-review/scripts/check-update.js --auto
 
 **禁止**：跳过确认直接写分析、用 answer comparison 覆盖截图标记。
 
-### Step 2: Generate Review HTML
+### Step 2: Generate Review Data JSON (v4.0)
 
-基于 `assets/review-template.html` 模板，使用 `references/` 下的规范生成完整复盘 HTML 文件。
+**⚠️ 不再生成复盘 HTML！** 后端 `review.html` 模板页统一渲染 JSON，单独生成 HTML 无用。
 
-**🔴 文件命名强制规范（MUST FOLLOW）**：
-
-文件名格式：`剑{book}-Test{test}-Passage{passage}-{titleCN}复盘.html`
-
-- `{titleCN}` **必须与 JSON 里的 `source.titleCN` 字段完全一致**（同一个字符串，一字不差）
-- **必须以"复盘"两字结尾**（不是"积累"、不是直接 `.html`）
-- **禁止**：空格、下划线、英文连字符中混中文
-- 示例：
-  - ✅ `剑5-Test1-Passage2-鲸鱼感官复盘.html`
-  - ✅ `剑6-Test4-Passage2-识字女性与育儿复盘.html`
-  - ❌ `剑4-Test3-Passage2-火山专题积累.html`（缺"复盘"两字）
-  - ❌ `剑6-Test4-Passage2-识字女性育儿复盘.html`（和 title 里"与"字不一致）
-
-**命名一致性自检（生成前必做）**：
-1. 决定 `titleCN` 后，HTML 文件名、JSON 文件名、JSON 内 `source.titleCN` 三者必须用**完全相同**的中文串
-2. 生成完成后，自查输出"`{文件名}` 和 `source.titleCN='{titleCN}'` 一致 ✅"
-3. 如果篇目已在 `site/answer-key.json` 里存在，直接复用其 `title` 字段作为 `titleCN`，**不要自创新表述**（避免和已有文件/数据库漂移）
-
-遵循 `references/review-style-guide.md` 的设计规范（V2 紫色渐变主题、Lucide 图标、卡片布局）。
-
-### Step 3: Generate Review Data JSON (v4.0)
-
-在生成 HTML 的同时，输出一份结构化 JSON 文件，供后续导入 Web 系统。**Web 端 `review.html` 通用模板页可直接渲染此 JSON。**
+直接生成结构化 JSON 文件，供 saveReview API 入库 + 后端 review.html 模板渲染。
 
 **输出文件命名规则**：`剑X-TestX-PassageX-中文主题复盘.json`
 
-> 命名必须与 Step 2 的 HTML 文件名**主干完全一致**（只差后缀），否则会触发 Web 端路径错乱。
-
 示例：
-- HTML: `剑5-Test1-Passage2-鲸鱼感官复盘.html`
 - JSON: `剑5-Test1-Passage2-鲸鱼感官复盘.json`
 - `source.titleCN`: `"鲸鱼感官"`
 
@@ -242,7 +213,7 @@ node ~/.workbuddy/skills/ielts-reading-review/scripts/check-update.js --auto
   "title_en": "English Title",
   "subtitle": "剑X · Test Y · Passage Z · 双语逐段对照",
   "source_info": "Cambridge IELTS X, Test Y, Reading Passage Z",
-  "review_link": "../reviews/剑X-TestY-PassageZ-{titleCN}复盘.html",
+  "review_link": "../review.html?file=剑X-TestY-PassageZ-{titleCN}复盘.json",
   "paragraphs": [
     { "label": "Paragraph A", "en": "English text with <span class=\"vocab-highlight\" title=\"释义\">highlighted</span> words", "cn": "中文翻译" }
   ],
@@ -261,42 +232,29 @@ node ~/.workbuddy/skills/ielts-reading-review/scripts/check-update.js --auto
 
 > **v3.8 起不再需要**。旧 `bilingual/*.html` 已清理，Web 端通过 `bilingual.html` 模板页动态加载 `bilingual_data.json` 渲染。
 
-### Step 4: Generate PDF (Optional)
+### Step 4: Generate PDF (Optional — Rarely Used)
 
-如果用户需要 PDF：
-
-```bash
-node scripts/generate-pdf.js 剑X-TestX-PassageX-主题复盘.html
-```
-
-需要 puppeteer-core + 本地 Chrome。PDF 输出到同目录。
+如果用户明确需要 PDF，可从线上复盘页面打印。本地不再生成 HTML，因此也不支持 puppeteer PDF 生成。
 
 ### Step 5: Update Memory
 
 复盘完成后更新 working memory：新增的错误模式、词汇、成绩数据。
 
-### Step 6: Apply to Web (User-Initiated)
+### Step 6: Apply to Web (Automatic — saveReview API)
 
-复盘生成完成后，**输出以下引导**：
+复盘 JSON 生成后，**必须立即通过 saveReview API 入库**（Step 7c），不需要用户手动操作。
 
----
-
-📤 **复盘文件已生成！**
-
-| 文件 | 用途 |
-|------|------|
-| `剑X-TestX-PassageX-主题复盘.html` | 双击打开即可阅读，可打印 |
-| `剑X-TestX-PassageX-主题复盘.json` | 导入到 Web 端同步成绩。部署后可在线通过 `review.html?file=xxx.json` 查看 |
-
-**一键同步到 Web 端** 👉 [点此上传 JSON](https://tuyaya.online/ielts/submit.html?mode=json)
-
-上传页面会自动从 JSON 中识别出篇目信息（如「剑5 Test1 Passage2 · 鲸鱼感官」），确认后点击「导入」即可。
-
-> 💡 JSON 文件在你当前的工作目录中，文件名如 `剑5-Test1-Passage2-鲸鱼感官复盘.json`
+完成后输出：
 
 ---
 
-#### 其他同步方式
+📤 **复盘完成！**
+
+JSON 已入库，线上查看 👉 [review.html?file=剑X-TestX-PassageX-主题复盘.json](https://tuyaya.online/ielts/review.html?file=剑X-TestX-PassageX-主题复盘.json)
+
+---
+
+#### 其他同步方式（备选）
 
 **方式 B：Skill 伴侣脚本**（私有部署场景）
 
@@ -310,21 +268,16 @@ node ~/.workbuddy/skills/ielts-server-sync/scripts/upload.js 剑5-T1-P2.json
 node ~/.workbuddy/skills/ielts-server-sync/scripts/upload.js --batch ./reviews/
 ```
 
-**方式 C：纯离线**
+**方式 C：手动上传**
 
-直接双击 `.html` 文件即可阅读 / 打印，不依赖任何服务器。
-
-**重要**：Skill 本身 **不执行任何网络请求**。所有上传操作由用户主动发起，数据隐私可控。
+打开 [submit.html?mode=json](https://tuyaya.online/ielts/submit.html?mode=json) 拖入 JSON 文件。
 
 ### Step 7: Deploy Checklist (MANDATORY — DO NOT SKIP)
 
 **🔴 每次复盘完成后，必须逐项执行以下检查清单。不能靠记忆，必须逐条过。**
 
-这是 2026-04-27 踩了6个坑后总结的教训——文件遗漏、部署遗漏、数据遗漏。
-
 #### 7a. 本地文件归位
 
-- [ ] 复盘 HTML 已复制到 `site/reviews/`（不是根目录！）
 - [ ] 复盘 JSON 已复制到 `site/reviews/`
 - [ ] `answer-key.json` 已更新（新增本篇条目）
 - [ ] `bilingual_data.json` 已新增本篇双语数据（英中逐段对照 + 词汇列表）
@@ -349,17 +302,56 @@ else:
 如果有缺失词：**立即补充到 dict_full.json**（每词需含 meaning_cn、phonetic、root、examples、synonyms、antonyms），补完重新部署。
 **绝不能跳过此步**——缺词 = 线上词卡点击无响应 = 用户体验崩坏。
 
-#### 7b. SCP 部署到线上
+#### 7b. 部署到线上
 
-所有以下文件必须通过 Cloudflare Tunnel SCP 部署到 `/var/www/ielts/`：
+所有以下文件必须部署到 `/var/www/ielts/`：
 
 ```
-site/reviews/剑X-TestX-PassageX-主题复盘.html    → /var/www/ielts/reviews/
 site/reviews/剑X-TestX-PassageX-主题复盘.json    → /var/www/ielts/reviews/
 site/answer-key.json                             → /var/www/ielts/
 site/bilingual_data.json                         → /var/www/ielts/
 site/dict_full.json                              → /var/www/ielts/
 site/synonym_data.json                           → /var/www/ielts/
+```
+
+**🔴 大文件传输规则（>1MB 的文件必须用分块方式）**：
+
+Cloudflare Tunnel SCP 对单文件有隐性超时限制（约 30s），大于 1MB 的文件（如 dict_full.json ~6MB）**禁止直接 SCP**，必须分块传输：
+
+```bash
+# 1. 本地分块（200KB/块）
+split -b 200000 site/dict_full.json /tmp/dchunk_
+
+# 2. 分批 SCP（每批 5 个文件，每批约 1MB）
+scp -o ConnectTimeout=15 \
+    -o StrictHostKeyChecking=accept-new \
+    -o UserKnownHostsFile=~/.ssh/known_hosts_cfd \
+    -o "ProxyCommand=/Users/dengjiawei/bin/cloudflared access tcp --hostname ssh.tuyaya.online" \
+    -i ~/.ssh/workbuddy.pem \
+    /tmp/dchunk_aa /tmp/dchunk_ab /tmp/dchunk_ac /tmp/dchunk_ad /tmp/dchunk_ae \
+    ubuntu@ssh.tuyaya.online:/tmp/
+# ... 重复直到所有块传完
+
+# 3. 服务端拼合
+ssh openclaw-tunnel "cat /tmp/dchunk_* > /var/www/ielts/dict_full.json && rm -f /tmp/dchunk_*"
+
+# 4. 验证完整性
+ssh openclaw-tunnel "python3 -c \"import json; d=json.load(open('/var/www/ielts/dict_full.json')); print(f'OK: {len(d)} words')\""
+```
+
+**小文件（<1MB）仍可直接 SCP**：
+```bash
+scp -o ConnectTimeout=15 \
+    -o StrictHostKeyChecking=accept-new \
+    -o UserKnownHostsFile=~/.ssh/known_hosts_cfd \
+    -o "ProxyCommand=/Users/dengjiawei/bin/cloudflared access tcp --hostname ssh.tuyaya.online" \
+    -i ~/.ssh/workbuddy.pem \
+    <本地文件> ubuntu@ssh.tuyaya.online:/var/www/ielts/
+```
+
+**或用 SSH stdin 管道（<500KB 的文件最快）**：
+```bash
+ssh openclaw-tunnel "cat > /var/www/ielts/synonym_data.json" < site/synonym_data.json
 ```
 
 #### 7c. saveReview API 入库（MANDATORY）
@@ -385,7 +377,30 @@ print(resp.read().decode())
 
 > API 路径是 `POST /api/ielts`，通过 `action` 字段分发（不是 `/api/ielts/saveReview`）。
 
-#### 7d. 后端重启
+#### 7d. 后端代码部署（仅当 server/index.js 有改动时）
+
+如果本次涉及 server 代码变更，需同步后端：
+
+```bash
+# 后端小文件可直接 stdin 传
+ssh openclaw-tunnel "cat > /home/ubuntu/ielts-api/index.js" < server/index.js
+
+# 新增的 lib/ 目录
+ssh openclaw-tunnel "mkdir -p /home/ubuntu/ielts-api/lib"
+ssh openclaw-tunnel "cat > /home/ubuntu/ielts-api/lib/llmExtractor.js" < server/lib/llmExtractor.js
+ssh openclaw-tunnel "cat > /home/ubuntu/ielts-api/lib/schemaUpgrader.js" < server/lib/schemaUpgrader.js
+ssh openclaw-tunnel "cat > /home/ubuntu/ielts-api/lib/tencentOcr.js" < server/lib/tencentOcr.js
+
+# 如有新 npm 依赖
+ssh openclaw-tunnel "cd /home/ubuntu/ielts-api && npm install"
+```
+
+**🔴 部署红线**：
+- **严禁覆盖 `/etc/systemd/system/ielts-api.service`**——里面有 AI_API_URL/KEY/MODEL 等生产密钥
+- 新密钥只通过 drop-in 追加：`/etc/systemd/system/ielts-api.service.d/secrets.conf`
+- 详见 `.workbuddy/upload-upgrade-ops.md`
+
+#### 7e. 后端重启
 
 ```bash
 ssh openclaw-tunnel "sudo systemctl restart ielts-api"
@@ -393,32 +408,24 @@ ssh openclaw-tunnel "sudo systemctl restart ielts-api"
 
 **必须重启**——后端启动时 `buildReviewFileIndex()` 扫描 `reviews/` 目录建索引。不重启 = 新文件不出现在首页。
 
-#### 7e. 线上验证
+#### 7f. 线上验证
 
 - [ ] `getReadingPageData` API 返回新篇目数据（`POST /api/ielts` + `action: getReadingPageData`）
 - [ ] `bilingual.html?book=X&test=Y&passage=Z` 能正常显示双语内容
-- [ ] 复盘链接可正常访问：
-  - 有 JSON 的篇目：`review.html?file=剑X-TestX-PassageX-主题复盘.json`（新模板页）
-  - 仅有 HTML 的旧篇目：`reviews/剑X-TestX-PassageX-主题复盘.html`（旧静态页）
+- [ ] 复盘链接可正常访问：`review.html?file=剑X-TestX-PassageX-主题复盘.json`
 - [ ] **🔴 词卡展开验证**：打开复盘页面，点击词汇表中至少 1 个词，确认能弹出详情卡（含释义/例句/近义词）。如果点击无反应 → dict_full.json 缺词，回 7a 补词
-
-#### 7f. HTML 模板检查
-
-新生成的复盘 HTML 必须满足：
-- hero-nav 使用 `/ielts/reading.html`（绝对路径，不是 `../reading.html`）
-- 按钮文字为"目录"（不是"首页"）
-- icon 为 `list`（不是 `home`）
 
 **曾犯的典型遗漏**（引以为戒）：
 1. 文件生成在根目录没 cp 到 site/reviews/
 2. bilingual_data.json 本地更新了忘了 SCP
 3. 只做了 P1 双语没做同套题的 P2/P3 双语
 4. 没重启后端导致 review 索引没刷新
-5. hero-nav 按钮用了旧模板（相对路径 + "首页"）
-6. JSON 文件没 SCP 到 reviews/
-7. **dict_full.json 缺词导致词卡展开不工作**——复盘新增词汇不在词库中，必须做词库覆盖校验
-8. **没调 saveReview API 导致首页进度图缺数据**——文件部署 ≠ 数据入库，两者都要做
-9. **answers[] 用了错误字段名**——必须用 `my`/`correct`(字符串)/`result`(字符串)，不能用布尔值
+5. JSON 文件没 SCP 到 reviews/
+6. **dict_full.json 缺词导致词卡展开不工作**——复盘新增词汇不在词库中，必须做词库覆盖校验
+7. **没调 saveReview API 导致首页进度图缺数据**——文件部署 ≠ 数据入库，两者都要做
+8. **answers[] 用了错误字段名**——必须用 `my`/`correct`(字符串)/`result`(字符串)，不能用布尔值
+9. **不要生成复盘 HTML**——后端 review.html 模板统一渲染 JSON，单独生成 HTML 无用
+10. **dict_full.json 直接 SCP 超时**——5.8MB+ 文件禁止单文件 SCP，必须 split 分块→分批传→cat 拼合（详见 7b）
 
 ## Batch Import Mode (v3.8 — Legacy Review Folder → JSON)
 
