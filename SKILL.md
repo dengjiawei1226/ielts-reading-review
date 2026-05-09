@@ -280,6 +280,9 @@ node ~/.workbuddy/skills/ielts-server-sync/scripts/upload.js --batch ./reviews/
 
 - [ ] 复盘 JSON 已复制到 `site/reviews/`
 - [ ] `answer-key.json` 已更新（新增本篇条目）
+  - **🔴 Key 格式必须是 `C{book}-T{test}-R{passage}`**（R = Reading，不是 P！）
+  - 例：`C7-T3-R1`，不是 ~~C7-T3-P1~~
+  - 听力用 `L`：`C4-T1-L2`
 - [ ] `bilingual_data.json` 已新增本篇双语数据（英中逐段对照 + 词汇列表）
 - [ ] `generate_vocab_synonym.py` 已运行，更新 dict_full.json + synonym_data.json
 - [ ] **🔴 词库覆盖校验（MUST — 否则词卡展开不工作）**：运行以下检查，确保本篇所有 vocabulary 词汇都在 `dict_full.json` 中有完整条目（含 meaning_cn + examples）
@@ -426,6 +429,7 @@ ssh openclaw-tunnel "sudo systemctl restart ielts-api"
 8. **answers[] 用了错误字段名**——必须用 `my`/`correct`(字符串)/`result`(字符串)，不能用布尔值
 9. **不要生成复盘 HTML**——后端 review.html 模板统一渲染 JSON，单独生成 HTML 无用
 10. **dict_full.json 直接 SCP 超时**——5.8MB+ 文件禁止单文件 SCP，必须 split 分块→分批传→cat 拼合（详见 7b）
+11. **answer-key.json key 格式写错**——必须是 `C{book}-T{test}-R{passage}`（R=Reading），写成 P 会导致首页找不到该篇复盘
 
 ## Batch Import Mode (v3.8 — Legacy Review Folder → JSON)
 
