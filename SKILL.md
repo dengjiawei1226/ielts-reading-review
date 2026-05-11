@@ -9,12 +9,16 @@ description: "IELTS Reading passage review, scoring, and progress tracking skill
 
 帮用户把雅思阅读做题结果变成结构化数据（JSON），通过 saveReview API 入库后由后端 review.html 模板统一渲染页面。
 
-## Architecture (v4.0 — JSON Only + Server Template)
+## Architecture (v5.0 — Slim Deploy + Pre-populated Backend)
+
+**⚠️ v5.0 重大简化**：服务端已预置 C4-C20 全量 answer-key（204条 reading）+ bilingual_data（100条核心双语），**复盘流程不再需要更新这两个文件**，部署清单大幅缩减。
 
 **⚠️ 不再生成复盘 HTML！** 后端 `review.html` 模板页统一渲染 JSON，单独生成的 HTML 完全无用。
 
 产出物：
 1. **结构化 JSON（v4.0）** — 成绩、错题、词汇、同义替换的全量数据。通过 saveReview API 入库后，`review.html?file=xxx.json` 在线渲染
+
+> **v5.0 变更（2026-05-11）**：服务端预置 C4-C20 全量 answer-key + bilingual_data，复盘流程不再需要本地维护这两个文件。仅当复盘 C20 之后的新书才需要扩展。部署清单从 5 个文件缩减到 4 个（仅 JSON + 词汇相关）。
 
 > **v4.0 变更**：不再生成复盘 HTML。后端 review.html 模板页统一渲染 JSON，单独生成 HTML 无用。复盘只需 JSON + saveReview API 入库。
 
@@ -196,37 +200,15 @@ node ~/.workbuddy/skills/ielts-reading-review/scripts/check-update.js --auto
 
 > **注意**：`wrongQuestions[]` 里用的是 `myAnswer` / `correctAnswer`（全拼），和 `answers[]` 的缩写不同。这是历史设计，review.html 模板已做兼容处理，两种格式都能正确渲染。
 
-### Step 3b: Generate Bilingual Data (MANDATORY — JSON only, no HTML)
+### Step 3b: Bilingual Data (v5.0 — 已预置，无需操作)
 
-**每次复盘必须同时完成一件事**，无需用户提醒：
-
-#### 追加双语数据到 bilingual_data.json
-
-> **⚠️ v3.8 变更**：不再生成独立的双语 HTML 文件。Web 端已全面动态化，`bilingual.html?book=X&test=Y&passage=Z` 直接从 `bilingual_data.json` 加载渲染。旧的 `site/bilingual/*.html` 已清理。
-
-在 `site/bilingual_data.json` 中追加一条结构化数据：
-
-```json
-{
-  "book": 7, "test": 1, "passage": 1,
-  "title_cn": "中文标题",
-  "title_en": "English Title",
-  "subtitle": "剑X · Test Y · Passage Z · 双语逐段对照",
-  "source_info": "Cambridge IELTS X, Test Y, Reading Passage Z",
-  "review_link": "../review.html?file=剑X-TestY-PassageZ-{titleCN}复盘.json",
-  "paragraphs": [
-    { "label": "Paragraph A", "en": "English text with <span class=\"vocab-highlight\" title=\"释义\">highlighted</span> words", "cn": "中文翻译" }
-  ],
-  "vocab_words": [
-    { "word": "example", "meaning": "释义", "example": "Example sentence." }
-  ]
-}
-```
-
-**规则**：
-- 词汇高亮：用正则替换英文段落中首次出现的词汇为 `<span class="vocab-highlight" title="释义">word</span>`
-- 追加后按 `(book, test, passage)` 排序
-- **⚠️ Python 脚本中中文引号会被当作字符串终止符**——中文 `""` 必须用 `\u201c\u201d` 转义
+> **⚠️ v5.0 变更（2026-05-11）**：服务端已预置 C4-C20 100 篇核心双语数据，复盘流程**不再需要**生成或维护 bilingual_data.json。
+>
+> 仅以下场景需要扩展：
+> - 复盘 C20 之后的新书（C21+）
+> - 用户明确要求为某篇生成精翻双语
+>
+> 默认跳过此步骤。
 
 #### ~~3b-2: 双语 HTML 文件~~（已废弃）
 
@@ -279,13 +261,10 @@ node ~/.workbuddy/skills/ielts-server-sync/scripts/upload.js --batch ./reviews/
 #### 7a. 本地文件归位
 
 - [ ] 复盘 JSON 已复制到 `site/reviews/`
-- [ ] `answer-key.json` 已更新（新增本篇条目）
-  - **🔴 Key 格式必须是 `C{book}-T{test}-R{passage}`**（R = Reading，不是 P！）
-  - 例：`C7-T3-R1`，不是 ~~C7-T3-P1~~
-  - 听力用 `L`：`C4-T1-L2`
-- [ ] `bilingual_data.json` 已新增本篇双语数据（英中逐段对照 + 词汇列表）
 - [ ] `generate_vocab_synonym.py` 已运行，更新 dict_full.json + synonym_data.json
 - [ ] **🔴 词库覆盖校验（MUST — 否则词卡展开不工作）**：运行以下检查，确保本篇所有 vocabulary 词汇都在 `dict_full.json` 中有完整条目（含 meaning_cn + examples）
+
+> **v5.0 变更**：~~answer-key.json 更新~~ 和 ~~bilingual_data.json 更新~~ 已从清单中移除。服务端已预置 C4-C20 全量数据，复盘流程无需再维护这两个文件。复盘 C21+ 时才需要扩展 answer-key（参考末尾「扩展新书」章节）。
 
 ```python
 # 词库覆盖校验（复盘生成后必跑）
@@ -307,12 +286,10 @@ else:
 
 #### 7b. 部署到线上
 
-所有以下文件必须部署到 `/var/www/ielts/`：
+**v5.0 精简后只需部署以下 3 个文件**（answer-key/bilingual 已服务端预置）：
 
 ```
 site/reviews/剑X-TestX-PassageX-主题复盘.json    → /var/www/ielts/reviews/
-site/answer-key.json                             → /var/www/ielts/
-site/bilingual_data.json                         → /var/www/ielts/
 site/dict_full.json                              → /var/www/ielts/
 site/synonym_data.json                           → /var/www/ielts/
 ```
@@ -414,22 +391,30 @@ ssh openclaw-tunnel "sudo systemctl restart ielts-api"
 #### 7f. 线上验证
 
 - [ ] `getReadingPageData` API 返回新篇目数据（`POST /api/ielts` + `action: getReadingPageData`）
-- [ ] `bilingual.html?book=X&test=Y&passage=Z` 能正常显示双语内容
 - [ ] 复盘链接可正常访问：`review.html?file=剑X-TestX-PassageX-主题复盘.json`
 - [ ] **🔴 词卡展开验证**：打开复盘页面，点击词汇表中至少 1 个词，确认能弹出详情卡（含释义/例句/近义词）。如果点击无反应 → dict_full.json 缺词，回 7a 补词
+- [ ] （v5.0 已预置）双语数据 C4-C20 已服务端预置，无需逐篇验证；C21+ 新书需手动确认 `bilingual.html?book=X&test=Y&passage=Z`
 
 **曾犯的典型遗漏**（引以为戒）：
 1. 文件生成在根目录没 cp 到 site/reviews/
-2. bilingual_data.json 本地更新了忘了 SCP
-3. 只做了 P1 双语没做同套题的 P2/P3 双语
-4. 没重启后端导致 review 索引没刷新
-5. JSON 文件没 SCP 到 reviews/
-6. **dict_full.json 缺词导致词卡展开不工作**——复盘新增词汇不在词库中，必须做词库覆盖校验
-7. **没调 saveReview API 导致首页进度图缺数据**——文件部署 ≠ 数据入库，两者都要做
-8. **answers[] 用了错误字段名**——必须用 `my`/`correct`(字符串)/`result`(字符串)，不能用布尔值
-9. **不要生成复盘 HTML**——后端 review.html 模板统一渲染 JSON，单独生成 HTML 无用
-10. **dict_full.json 直接 SCP 超时**——5.8MB+ 文件禁止单文件 SCP，必须 split 分块→分批传→cat 拼合（详见 7b）
-11. **answer-key.json key 格式写错**——必须是 `C{book}-T{test}-R{passage}`（R=Reading），写成 P 会导致首页找不到该篇复盘
+2. 没重启后端导致 review 索引没刷新
+3. JSON 文件没 SCP 到 reviews/
+4. **dict_full.json 缺词导致词卡展开不工作**——复盘新增词汇不在词库中，必须做词库覆盖校验
+5. **没调 saveReview API 导致首页进度图缺数据**——文件部署 ≠ 数据入库，两者都要做
+6. **answers[] 用了错误字段名**——必须用 `my`/`correct`(字符串)/`result`(字符串)，不能用布尔值
+7. **不要生成复盘 HTML**——后端 review.html 模板统一渲染 JSON，单独生成 HTML 无用
+8. **dict_full.json 直接 SCP 超时**——5.8MB+ 文件禁止单文件 SCP，必须 split 分块→分批传→cat 拼合（详见 7b）
+
+## 扩展新书（C21+）
+
+服务端预置数据仅覆盖 C4-C20。复盘剑21及以后的书时，需要额外做：
+
+1. 在 `site/answer-key.json` 追加条目（格式：`C{book}-T{test}-R{passage}`，**R 不是 P**）
+2. SCP 到 `/var/www/ielts/answer-key.json`
+3. （可选）追加 `site/bilingual_data.json` 并 SCP
+4. 重启后端：`ssh openclaw-tunnel "sudo systemctl restart ielts-api"`
+
+C4-C20 范围内的复盘**不需要**这一步。
 
 ## Batch Import Mode (v3.8 — Legacy Review Folder → JSON)
 
