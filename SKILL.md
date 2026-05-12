@@ -9,7 +9,12 @@ description: "IELTS Reading passage review, scoring, and progress tracking skill
 
 帮用户把雅思阅读做题结果变成结构化数据（JSON），通过 saveReview API 入库后由后端 review.html 模板统一渲染页面。
 
-## Architecture (v5.0 — Slim Deploy + Pre-populated Backend)
+## Architecture (v5.1 — Slim Deploy + Triple Safety Net)
+
+**⚠️ v5.1 新增三道防线**（防 saveReview 漏调 / 本地副本陈旧）：
+1. **发布脚本自动同步本地副本**：publish-clawhub.sh 跑完后自动 `clawhub install --force` 到 `~/.workbuddy/skills/`
+2. **Step 7g 强制入库回归验证**：调 saveReview 后必须再用 getReviews 回查确认入库，**部署 ≠ 入库**
+3. **Step 0 强制展示版本横幅**：每次激活时输出本地+远程版本号，落后必告警
 
 **⚠️ v5.0 重大简化**：服务端已预置 C4-C20 全量 answer-key（204条 reading）+ bilingual_data（100条核心双语），**复盘流程不再需要更新这两个文件**，部署清单大幅缩减。
 
@@ -17,6 +22,8 @@ description: "IELTS Reading passage review, scoring, and progress tracking skill
 
 产出物：
 1. **结构化 JSON（v4.0）** — 成绩、错题、词汇、同义替换的全量数据。通过 saveReview API 入库后，`review.html?file=xxx.json` 在线渲染
+
+> **v5.1 变更（2026-05-11 晚）**：三道防线避免再犯 saveReview 漏调 + 本地副本不更新的坑。
 
 > **v5.0 变更（2026-05-11）**：服务端预置 C4-C20 全量 answer-key + bilingual_data，复盘流程不再需要本地维护这两个文件。仅当复盘 C20 之后的新书才需要扩展。部署清单从 5 个文件缩减到 4 个（仅 JSON + 词汇相关）。
 
@@ -34,26 +41,24 @@ description: "IELTS Reading passage review, scoring, and progress tracking skill
 
 ## Step 0: Version Check (Auto — Run on Every Activation)
 
-**每次 Skill 被激活时，先检查版本是否最新**：
+**每次 Skill 被激活时，第一件事必须显式输出当前版本横幅**：
 
 ```bash
 node ~/.workbuddy/skills/ielts-reading-review/scripts/check-update.js
 ```
 
-- 如果输出 `✅ 已是最新版本` → 继续正常工作
-- 如果输出 `🆕 有新版本可用！` → **提示用户**：
-
-```
-⚠️ ielts-reading-review 有新版本 vX.Y.Z（当前 vA.B.C），是否更新？
-更新内容可能包含新的错误分类规则、部署步骤修复等。
-```
-
-用户同意后执行自动更新：
-```bash
-node ~/.workbuddy/skills/ielts-reading-review/scripts/check-update.js --auto
-```
+**强制行为规范**：
+1. **必须把 check-update.js 的输出原样展示给用户**（包含本地版本号 + 远程版本号），不能省略
+2. 如果输出包含 `🆕 有新版本可用` → **立即提示用户并询问是否更新**：
+   ```
+   ⚠️ ielts-reading-review 有新版本 vX.Y.Z（当前 vA.B.C），强烈建议先更新再开始复盘。
+   现在更新？
+   ```
+3. 用户同意后执行 `node ~/.workbuddy/skills/ielts-reading-review/scripts/check-update.js --auto`，等待安装完成后**让用户重新激活 Skill**（已加载的 context 不会热更）
+4. 用户拒绝更新 → 在回复开头加红字告警：`⚠️ 正在使用旧版本 vA.B.C，可能错过 v5.0+ 的简化流程`
 
 > 如果 `check-update.js` 不存在（旧版本安装），跳过版本检查继续工作。
+> **绝对禁止**：不输出版本号、隐瞒版本差距、用户没同意就开始复盘流程。
 
 ## Workflow
 
@@ -394,6 +399,30 @@ ssh openclaw-tunnel "sudo systemctl restart ielts-api"
 - [ ] 复盘链接可正常访问：`review.html?file=剑X-TestX-PassageX-主题复盘.json`
 - [ ] **🔴 词卡展开验证**：打开复盘页面，点击词汇表中至少 1 个词，确认能弹出详情卡（含释义/例句/近义词）。如果点击无反应 → dict_full.json 缺词，回 7a 补词
 - [ ] （v5.0 已预置）双语数据 C4-C20 已服务端预置，无需逐篇验证；C21+ 新书需手动确认 `bilingual.html?book=X&test=Y&passage=Z`
+
+#### 7g. 🔴 强制入库回归验证（v5.1 新增 — 防止 saveReview 漏调）
+
+**血泪教训（2026-05-11）**：复盘 JSON 部署成功了，但 saveReview API 没调通，导致首页看不到新篇。**部署 ≠ 入库**，必须**回查数据库**验证。
+
+完成 7c 后必须立即执行以下检查：
+
+```bash
+# 用 getReviews 回查本篇是否真的入库（替换 BOOK/TEST/PASSAGE）
+curl -s https://tuyaya.online/api/ielts -H 'Content-Type: application/json' \
+  -d '{"action":"getReviews","token":"<USER_TOKEN>","book":<BOOK>,"test":<TEST>}' \
+  | python3 -c "
+import json,sys
+d = json.load(sys.stdin)
+records = [r for r in d.get('data',[]) if r['book']==<BOOK> and r['test']==<TEST> and r['passage']==<PASSAGE>]
+if records:
+    print('✅ 入库成功:', records[0])
+else:
+    print('❌ 入库失败！必须重新调 saveReview API')
+    sys.exit(1)
+"
+```
+
+**如果验证失败**：立即重新调 saveReview API，再回查，直到 ✅。**绝对不能跳过此步**——本步骤 PASS 才算复盘真正完成。
 
 **曾犯的典型遗漏**（引以为戒）：
 1. 文件生成在根目录没 cp 到 site/reviews/

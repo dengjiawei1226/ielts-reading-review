@@ -117,14 +117,44 @@ function main() {
   if (AUTO) {
     console.log('🔄 正在自动更新...');
     try {
-      // 用 clawhub install 覆盖安装到用户级目录
-      const result = execSync(
-        `clawhub install ${SLUG} --dir "${path.join(process.env.HOME, '.workbuddy/skills')}"`,
-        { encoding: 'utf-8', stdio: 'inherit' }
-      );
-      console.log(`✅ 已更新到 v${remote}`);
+      const userSkillsDir = path.join(process.env.HOME, '.workbuddy/skills');
+      const targetDir = path.join(userSkillsDir, SLUG);
+      const backupDir = `${targetDir}.bak-${Date.now()}`;
+
+      // clawhub install 没有 --dir 参数，只能在 cwd 下创建 <slug> 子目录
+      // 策略：先备份旧目录，再在 userSkillsDir 下 install --force（必要时清理 skills/<slug> 嵌套）
+      if (fs.existsSync(targetDir)) {
+        fs.renameSync(targetDir, backupDir);
+        console.log(`📦 旧版本备份至：${backupDir}`);
+      }
+
+      execSync(`clawhub install ${SLUG} --force`, {
+        cwd: userSkillsDir,
+        encoding: 'utf-8',
+        stdio: 'inherit'
+      });
+
+      // 处理 clawhub 嵌套问题：有时会装到 ~/.workbuddy/skills/skills/<slug>
+      const nested = path.join(userSkillsDir, 'skills', SLUG);
+      if (fs.existsSync(nested) && !fs.existsSync(targetDir)) {
+        fs.renameSync(nested, targetDir);
+        const skillsDir = path.join(userSkillsDir, 'skills');
+        try { fs.rmdirSync(skillsDir); } catch (e) {}
+      }
+
+      if (fs.existsSync(targetDir)) {
+        console.log(`✅ 已更新到 v${remote}（备份保留在 ${backupDir}，确认无误后可手动删除）`);
+      } else {
+        // 失败回滚
+        if (fs.existsSync(backupDir)) {
+          fs.renameSync(backupDir, targetDir);
+          console.log('❌ 安装失败，已回滚到旧版本');
+        }
+        process.exit(1);
+      }
     } catch (e) {
-      console.log('❌ 自动更新失败，请手动运行: clawhub install ' + SLUG);
+      console.log('❌ 自动更新失败：' + e.message);
+      console.log('   请手动运行: cd ~/.workbuddy/skills && clawhub install ' + SLUG + ' --force');
       process.exit(1);
     }
   } else {
