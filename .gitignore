@@ -6,3 +6,4 @@ node_modules/
 一键发布-操作手册.md
 publish-clawhub.sh
 publish-github.sh
+.clawhub/

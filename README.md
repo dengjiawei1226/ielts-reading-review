@@ -6,6 +6,51 @@
 
 ---
 
+## 🆕 What's New in v5.4 — OAuth 风格浏览器授权流
+
+**告别 F12 复制 token 的笨流程**——客户端模式绑定账号体验彻底重做：
+
+### 🎯 30 秒上手（替代原来 5 分钟）
+
+```bash
+bash ~/.workbuddy/skills/ielts-reading-review/scripts/setup-client-mode.sh
+```
+
+脚本自动完成 4 件事：
+
+1. **本机起临时 HTTP 服务**（随机空闲端口监听 OAuth 回调）
+2. **唤起浏览器**到 `https://tuyaya.online/ielts/authorize.html`
+3. **页面显示 OAuth 风格卡片**：客户端名 / 本机回调地址 / 当前账号 / 权限列表 / 【拒绝】【授权】
+4. **点【授权】** → token 通过 `<img>` 请求回传本机 → 自动写入 `~/.zshrc` → 显示绑定账号名
+
+### 🔒 安全设计
+
+| 风险点 | 防护机制 |
+|---|---|
+| token 被中间人截获 | 全程仅浏览器 ↔ 本机 127.0.0.1，不走第三方 |
+| token 进 URL bar 被记录 | 用 `<img src=...?token>` GET 而非 `location.href`，不留浏览历史 |
+| CORS / Private Network 拦截 | 用图片请求绕过预检 |
+| 跨站伪造请求 | `secrets.token_urlsafe(16)` 生成 state，服务端校验 |
+| 恶意回调地址 | 授权页强制白名单：仅 `127.0.0.1 / localhost / ::1` + http |
+
+### 🪟 三系统全覆盖
+
+- macOS：`open` 命令唤起浏览器
+- Linux：`xdg-open`
+- 兜底：打印链接，用户手动复制到浏览器
+
+### 🛟 兜底模式
+
+浏览器/网络异常时：
+
+```bash
+bash setup-client-mode.sh --manual
+```
+
+回退到 F12 → Console → `localStorage.ielts_user_token` 复制粘贴的老流程。
+
+---
+
 ## 🆕 What's New in v3.1 — Web Hand-off
 
 ### 🌐 生成物一键上传到 Web 端
